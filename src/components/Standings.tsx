@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar } from '@radix-ui/themes';
 import { HomeIcon, StarFilledIcon, CheckCircledIcon, StarIcon } from '@radix-ui/react-icons';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import LoadingSpinner from './LoadingSpinner';
 import { useAuthStore } from '../store/authStore';
 import '../App.css';
@@ -32,7 +32,7 @@ export default function Standings() {
   const finalScore = location.state?.finalScore as number;
   const fromProfile = location.state?.fromProfile as boolean;
 
-  const [socket, setSocket] = useState<Socket | null>(null);
+  // const [socket, setSocket] = useState<Socket | null>(null);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
   const [contestInfo, setContestInfo] = useState<{ isLive: boolean; totalParticipants: number; capacity: number } | null>(null);
@@ -65,7 +65,7 @@ export default function Standings() {
       withCredentials: true,
     });
 
-    setSocket(socketInstance);
+    // setSocket(socketInstance);
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket, joining contest:', contestId);
@@ -141,12 +141,12 @@ export default function Standings() {
     }
   };
 
-  const getRankIcon = (rank: number) => {
-    if (rank <= 3) {
-      return <StarIcon width={24} height={24} />;
-    }
-    return null;
-  };
+  // const getRankIcon = (rank: number) => {
+  //   if (rank <= 3) {
+  //     return <StarIcon width={24} height={24} />;
+  //   }
+  //   return null;
+  // };
 
   const getMedalEmoji = (rank: number) => {
     switch (rank) {
@@ -165,7 +165,7 @@ export default function Standings() {
     return <LoadingSpinner message="Loading standings..." />;
   }
 
-  const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
+  // const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
 
   return (
     <Box style={{

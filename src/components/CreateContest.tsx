@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog, Checkbox } from '@radix-ui/themes';
 import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import '../App.css';
 
 interface FormData {

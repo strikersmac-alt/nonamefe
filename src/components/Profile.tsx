@@ -85,7 +85,7 @@ export default function Profile() {
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            // 'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
           credentials: 'include',

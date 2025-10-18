@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Progress, AlertDialog } from '@radix-ui/themes';
-import { CheckCircledIcon, ClockIcon, LightningBoltIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon, CrossCircledIcon, ClockIcon, LightningBoltIcon } from '@radix-ui/react-icons';
 import { io, Socket } from 'socket.io-client';
-import Cookies from 'js-cookie';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
-import { toast } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
@@ -148,14 +147,8 @@ export default function ContestPlay() {
 
   // Initialize socket and timer
   useEffect(() => {
-    const token = Cookies.get('authToken');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
     const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
-      auth: { token },
+      withCredentials: true,
     });
 
     setSocket(socketInstance);

@@ -141,18 +141,18 @@ export default function CreateContest() {
 
     try {
       // Get auth token from cookies
-      const token = Cookies.get('authToken');
-      if (!token) {
-        setResponse({
-          success: false,
-          message: 'Please sign in to create a contest',
-        });
-        setLoading(false);
-        return;
-      }
+      // const token = Cookies.get('authToken');
+      // if (!token) {
+      //   setResponse({
+      //     success: false,
+      //     message: 'Please sign in to create a contest',
+      //   });
+      //   setLoading(false);
+      //   return;
+      // }
 
       let result;
-      
+
       if (formData.contestType === 'nptel') {
         // NPTEL contest creation
         if (!formData.courseCode || formData.weeks.length === 0) {
@@ -180,9 +180,9 @@ export default function CreateContest() {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
             },
-          }
+            withCredentials: true,
+          },
         );
       } else {
         // Normal AI-generated contest creation
@@ -201,9 +201,9 @@ export default function CreateContest() {
           payload,
           {
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
             },
+            withCredentials: true,
           }
         );
       }
@@ -217,8 +217,8 @@ export default function CreateContest() {
 
           if (contestResponse.data.success && contestResponse.data.meta) {
             // Navigate directly to waiting room
-            navigate(`/contest/${contestResponse.data.meta.id}/waiting`, { 
-              state: { contestMeta: contestResponse.data.meta } 
+            navigate(`/contest/${contestResponse.data.meta.id}/waiting`, {
+              state: { contestMeta: contestResponse.data.meta }
             });
             return;
           }
@@ -309,296 +309,296 @@ export default function CreateContest() {
 
               {/* Form */}
               <form onSubmit={handleSubmit}>
-              <Flex direction="column" gap="3">
-                {/* Contest Type */}
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Contest Type <span style={{ color: '#f472b6' }}>*</span>
-                  </Text>
-                  <Select.Root
-                    value={formData.contestType}
-                    onValueChange={(value) => handleInputChange('contestType', value as 'normal' | 'nptel')}
-                    size="3"
-                  >
-                    <Select.Trigger
-                      style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
-                        color: 'white',
-                        width: '100%',
-                      }}
-                    />
-                    <Select.Content>
-                      <Select.Item value="normal">Normal (AI Generated)</Select.Item>
-                      <Select.Item value="nptel">NPTEL Questions</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
-
-                {/* NPTEL Course Selection */}
-                {formData.contestType === 'nptel' && (
+                <Flex direction="column" gap="3">
+                  {/* Contest Type */}
                   <Box>
                     <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                      Select Course <span style={{ color: '#f472b6' }}>*</span>
+                      Contest Type <span style={{ color: '#f472b6' }}>*</span>
                     </Text>
-                    {coursesLoading ? (
-                      <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>Loading courses...</Text>
-                    ) : courses.length === 0 ? (
-                      <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>No courses available</Text>
-                    ) : (
-                      <Box className="course-dropdown-container" style={{ position: 'relative', width: '100%' }}>
-                        <Box style={{ position: 'relative', width: '100%' }}>
-                          <input
-                            type="text"
-                            placeholder="Search for a course..."
-                            value={courseSearch}
-                            onChange={(e) => setCourseSearch(e.target.value)}
-                            onFocus={(e) => {
-                              setShowCourseDropdown(true);
-                              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
-                            }}
-                            onBlur={(e) => {
-                              e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-                            }}
-                            style={{
-                              width: '100%',
-                              padding: '0.625rem 1rem 0.625rem 2.5rem',
-                              background: 'rgba(15, 23, 42, 0.5)',
-                              border: '1px solid rgba(99, 102, 241, 0.3)',
-                              borderRadius: '0.5rem',
-                              color: 'white',
-                              fontSize: '0.875rem',
-                              outline: 'none',
-                              transition: 'border-color 0.2s ease',
-                              boxSizing: 'border-box',
-                              height: '40px',
-                            }}
-                          />
-                          <BookmarkIcon 
-                            width={16}
-                            height={16}
-                            style={{ 
-                              position: 'absolute', 
-                              left: '0.75rem', 
-                              top: '50%', 
-                              transform: 'translateY(-50%)',
-                              color: 'rgba(148, 163, 184, 0.7)',
-                              pointerEvents: 'none'
-                            }} 
-                          />
-                        </Box>
-                        
-                        {selectedCourse && !showCourseDropdown && (
-                          <Badge color="green" variant="soft" style={{ marginTop: '0.5rem' }}>
-                            Selected: {selectedCourse.name}
-                            {formData.weeks.length > 0 && ` • ${formData.weeks.includes(-1) ? 'Random weeks' : `${formData.weeks.length} week(s)`}`}
-                          </Badge>
-                        )}
-
-                        {showCourseDropdown && (
-                          <Box
-                            style={{
-                              position: 'absolute',
-                              top: 'calc(100% + 0.5rem)',
-                              left: 0,
-                              right: 0,
-                              maxHeight: '250px',
-                              overflowY: 'auto',
-                              background: 'rgba(15, 23, 42, 0.98)',
-                              backdropFilter: 'blur(20px)',
-                              border: '1.5px solid rgba(99, 102, 241, 0.4)',
-                              borderRadius: '0.75rem',
-                              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
-                              zIndex: 1000,
-                            }}
-                            className="custom-scrollbar"
-                          >
-                            {courses
-                              .filter(course => 
-                                course.name.toLowerCase().includes(courseSearch.toLowerCase()) ||
-                                course.code.toLowerCase().includes(courseSearch.toLowerCase())
-                              )
-                              .map(course => (
-                                <Box
-                                  key={course._id}
-                                  onClick={() => {
-                                    handleCourseSelect(course);
-                                    setShowCourseDropdown(false);
-                                    setCourseSearch(course.name);
-                                  }}
-                                  style={{
-                                    padding: '0.75rem 1rem',
-                                    cursor: 'pointer',
-                                    background: selectedCourse?._id === course._id
-                                      ? 'rgba(99, 102, 241, 0.2)'
-                                      : 'transparent',
-                                    borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
-                                    transition: 'background 0.2s ease',
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    if (selectedCourse?._id !== course._id) {
-                                      e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
-                                    }
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    if (selectedCourse?._id !== course._id) {
-                                      e.currentTarget.style.background = 'transparent';
-                                    }
-                                  }}
-                                >
-                                  <Flex direction="column" gap="1">
-                                    <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
-                                      {course.name}
-                                    </Text>
-                                    <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)' }}>
-                                      {course.code} • {course.durationInWeeks} weeks
-                                    </Text>
-                                  </Flex>
-                                </Box>
-                              ))}
-                          </Box>
-                        )}
-                      </Box>
-                    )}
+                    <Select.Root
+                      value={formData.contestType}
+                      onValueChange={(value) => handleInputChange('contestType', value as 'normal' | 'nptel')}
+                      size="3"
+                    >
+                      <Select.Trigger
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.5)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          color: 'white',
+                          width: '100%',
+                        }}
+                      />
+                      <Select.Content>
+                        <Select.Item value="normal">Normal (AI Generated)</Select.Item>
+                        <Select.Item value="nptel">NPTEL Questions</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
                   </Box>
-                )}
 
-                {/* Topic - Only for Normal contests */}
-                {formData.contestType === 'normal' && (
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Topic <span style={{ color: '#f472b6' }}>*</span>
-                  </Text>
-                  <TextField.Root
-                    size="3"
-                    placeholder="e.g., World History, Science, Technology"
-                    value={formData.topic}
-                    onChange={(e) => handleInputChange('topic', e.target.value)}
-                    required
-                    style={{
-                      background: 'rgba(15, 23, 42, 0.5)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                      color: 'white',
-                    }}
-                  />
-                </Box>
-                )}
+                  {/* NPTEL Course Selection */}
+                  {formData.contestType === 'nptel' && (
+                    <Box>
+                      <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                        Select Course <span style={{ color: '#f472b6' }}>*</span>
+                      </Text>
+                      {coursesLoading ? (
+                        <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>Loading courses...</Text>
+                      ) : courses.length === 0 ? (
+                        <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>No courses available</Text>
+                      ) : (
+                        <Box className="course-dropdown-container" style={{ position: 'relative', width: '100%' }}>
+                          <Box style={{ position: 'relative', width: '100%' }}>
+                            <input
+                              type="text"
+                              placeholder="Search for a course..."
+                              value={courseSearch}
+                              onChange={(e) => setCourseSearch(e.target.value)}
+                              onFocus={(e) => {
+                                setShowCourseDropdown(true);
+                                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
+                              }}
+                              onBlur={(e) => {
+                                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '0.625rem 1rem 0.625rem 2.5rem',
+                                background: 'rgba(15, 23, 42, 0.5)',
+                                border: '1px solid rgba(99, 102, 241, 0.3)',
+                                borderRadius: '0.5rem',
+                                color: 'white',
+                                fontSize: '0.875rem',
+                                outline: 'none',
+                                transition: 'border-color 0.2s ease',
+                                boxSizing: 'border-box',
+                                height: '40px',
+                              }}
+                            />
+                            <BookmarkIcon
+                              width={16}
+                              height={16}
+                              style={{
+                                position: 'absolute',
+                                left: '0.75rem',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                color: 'rgba(148, 163, 184, 0.7)',
+                                pointerEvents: 'none'
+                              }}
+                            />
+                          </Box>
 
-                {/* Difficulty - Only for Normal contests */}
-                {formData.contestType === 'normal' && (
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Difficulty <span style={{ color: '#f472b6' }}>*</span>
-                  </Text>
-                  <Select.Root
-                    value={formData.difficulty}
-                    onValueChange={(value) => handleInputChange('difficulty', value)}
-                    size="3"
-                  >
-                    <Select.Trigger
+                          {selectedCourse && !showCourseDropdown && (
+                            <Badge color="green" variant="soft" style={{ marginTop: '0.5rem' }}>
+                              Selected: {selectedCourse.name}
+                              {formData.weeks.length > 0 && ` • ${formData.weeks.includes(-1) ? 'Random weeks' : `${formData.weeks.length} week(s)`}`}
+                            </Badge>
+                          )}
+
+                          {showCourseDropdown && (
+                            <Box
+                              style={{
+                                position: 'absolute',
+                                top: 'calc(100% + 0.5rem)',
+                                left: 0,
+                                right: 0,
+                                maxHeight: '250px',
+                                overflowY: 'auto',
+                                background: 'rgba(15, 23, 42, 0.98)',
+                                backdropFilter: 'blur(20px)',
+                                border: '1.5px solid rgba(99, 102, 241, 0.4)',
+                                borderRadius: '0.75rem',
+                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6)',
+                                zIndex: 1000,
+                              }}
+                              className="custom-scrollbar"
+                            >
+                              {courses
+                                .filter(course =>
+                                  course.name.toLowerCase().includes(courseSearch.toLowerCase()) ||
+                                  course.code.toLowerCase().includes(courseSearch.toLowerCase())
+                                )
+                                .map(course => (
+                                  <Box
+                                    key={course._id}
+                                    onClick={() => {
+                                      handleCourseSelect(course);
+                                      setShowCourseDropdown(false);
+                                      setCourseSearch(course.name);
+                                    }}
+                                    style={{
+                                      padding: '0.75rem 1rem',
+                                      cursor: 'pointer',
+                                      background: selectedCourse?._id === course._id
+                                        ? 'rgba(99, 102, 241, 0.2)'
+                                        : 'transparent',
+                                      borderBottom: '1px solid rgba(99, 102, 241, 0.1)',
+                                      transition: 'background 0.2s ease',
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (selectedCourse?._id !== course._id) {
+                                        e.currentTarget.style.background = 'rgba(99, 102, 241, 0.1)';
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (selectedCourse?._id !== course._id) {
+                                        e.currentTarget.style.background = 'transparent';
+                                      }
+                                    }}
+                                  >
+                                    <Flex direction="column" gap="1">
+                                      <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                                        {course.name}
+                                      </Text>
+                                      <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)' }}>
+                                        {course.code} • {course.durationInWeeks} weeks
+                                      </Text>
+                                    </Flex>
+                                  </Box>
+                                ))}
+                            </Box>
+                          )}
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+
+                  {/* Topic - Only for Normal contests */}
+                  {formData.contestType === 'normal' && (
+                    <Box>
+                      <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                        Topic <span style={{ color: '#f472b6' }}>*</span>
+                      </Text>
+                      <TextField.Root
+                        size="3"
+                        placeholder="e.g., World History, Science, Technology"
+                        value={formData.topic}
+                        onChange={(e) => handleInputChange('topic', e.target.value)}
+                        required
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.5)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          color: 'white',
+                        }}
+                      />
+                    </Box>
+                  )}
+
+                  {/* Difficulty - Only for Normal contests */}
+                  {formData.contestType === 'normal' && (
+                    <Box>
+                      <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                        Difficulty <span style={{ color: '#f472b6' }}>*</span>
+                      </Text>
+                      <Select.Root
+                        value={formData.difficulty}
+                        onValueChange={(value) => handleInputChange('difficulty', value)}
+                        size="3"
+                      >
+                        <Select.Trigger
+                          style={{
+                            background: 'rgba(15, 23, 42, 0.5)',
+                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            color: 'white',
+                            width: '100%',
+                          }}
+                        />
+                        <Select.Content>
+                          <Select.Item value="easy">Easy</Select.Item>
+                          <Select.Item value="medium">Medium</Select.Item>
+                          <Select.Item value="hard">Hard</Select.Item>
+                        </Select.Content>
+                      </Select.Root>
+                    </Box>
+                  )}
+
+                  {/* Number of Questions */}
+                  <Box>
+                    <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                      Number of Questions <span style={{ color: '#f472b6' }}>*</span>
+                    </Text>
+                    <TextField.Root
+                      size="3"
+                      type="number"
+                      placeholder="10"
+                      value={formData.numQuestions}
+                      onChange={(e) => handleInputChange('numQuestions', e.target.value)}
+                      min="1"
+                      max="50"
+                      required
                       style={{
                         background: 'rgba(15, 23, 42, 0.5)',
                         border: '1px solid rgba(99, 102, 241, 0.3)',
                         color: 'white',
-                        width: '100%',
                       }}
                     />
-                    <Select.Content>
-                      <Select.Item value="easy">Easy</Select.Item>
-                      <Select.Item value="medium">Medium</Select.Item>
-                      <Select.Item value="hard">Hard</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
-                )}
+                  </Box>
 
-                {/* Number of Questions */}
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Number of Questions <span style={{ color: '#f472b6' }}>*</span>
-                  </Text>
-                  <TextField.Root
-                    size="3"
-                    type="number"
-                    placeholder="10"
-                    value={formData.numQuestions}
-                    onChange={(e) => handleInputChange('numQuestions', e.target.value)}
-                    min="1"
-                    max="50"
-                    required
-                    style={{
-                      background: 'rgba(15, 23, 42, 0.5)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                      color: 'white',
-                    }}
-                  />
-                </Box>
+                  {/* Mode */}
+                  <Box>
+                    <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                      Mode
+                    </Text>
+                    <Select.Root
+                      value={formData.mode}
+                      onValueChange={(value) => handleInputChange('mode', value)}
+                      size="3"
+                    >
+                      <Select.Trigger
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.5)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          color: 'white',
+                          width: '100%',
+                        }}
+                      />
+                      <Select.Content>
+                        <Select.Item value="duel">Duel</Select.Item>
+                        <Select.Item value="practice">Practice</Select.Item>
+                        <Select.Item value="multiplayer">Multiplayer</Select.Item>
+                      </Select.Content>
+                    </Select.Root>
+                  </Box>
 
-                {/* Mode */}
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Mode
-                  </Text>
-                  <Select.Root
-                    value={formData.mode}
-                    onValueChange={(value) => handleInputChange('mode', value)}
-                    size="3"
-                  >
-                    <Select.Trigger
+                  {/* Duration */}
+                  <Box>
+                    <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                      Duration (minutes)
+                    </Text>
+                    <TextField.Root
+                      size="3"
+                      type="number"
+                      placeholder="10"
+                      value={formData.duration}
+                      onChange={(e) => handleInputChange('duration', e.target.value)}
+                      min="1"
+                      max="180"
                       style={{
                         background: 'rgba(15, 23, 42, 0.5)',
                         border: '1px solid rgba(99, 102, 241, 0.3)',
                         color: 'white',
-                        width: '100%',
                       }}
                     />
-                    <Select.Content>
-                      <Select.Item value="duel">Duel</Select.Item>
-                      <Select.Item value="practice">Practice</Select.Item>
-                      <Select.Item value="multiplayer">Multiplayer</Select.Item>
-                    </Select.Content>
-                  </Select.Root>
-                </Box>
+                  </Box>
 
-                {/* Duration */}
-                <Box>
-                  <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
-                    Duration (minutes)
-                  </Text>
-                  <TextField.Root
+                  {/* Submit Button */}
+                  <Button
+                    type="submit"
                     size="3"
-                    type="number"
-                    placeholder="10"
-                    value={formData.duration}
-                    onChange={(e) => handleInputChange('duration', e.target.value)}
-                    min="1"
-                    max="180"
+                    disabled={loading}
                     style={{
-                      background: 'rgba(15, 23, 42, 0.5)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                      color: 'white',
+                      marginTop: '0.5rem',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      opacity: loading ? 0.7 : 1,
+                      fontWeight: 600,
                     }}
-                  />
-                </Box>
-
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  size="3"
-                  disabled={loading}
-                  style={{
-                    marginTop: '0.5rem',
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    opacity: loading ? 0.7 : 1,
-                    fontWeight: 600,
-                  }}
-                >
-                  <RocketIcon />
-                  {loading ? 'Creating Contest...' : 'Create Contest'}
-                </Button>
-              </Flex>
-            </form>
+                  >
+                    <RocketIcon />
+                    {loading ? 'Creating Contest...' : 'Create Contest'}
+                  </Button>
+                </Flex>
+              </form>
             </Box>
           )}
 
@@ -669,7 +669,7 @@ export default function CreateContest() {
 
       {/* Week Selection Modal */}
       <Dialog.Root open={showWeekModal} onOpenChange={setShowWeekModal}>
-        <Dialog.Content style={{ 
+        <Dialog.Content style={{
           maxWidth: 650,
           background: 'rgba(15, 23, 42, 0.95)',
           backdropFilter: 'blur(20px)',
@@ -678,18 +678,18 @@ export default function CreateContest() {
           <Dialog.Title style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '1rem' }}>
             Select Weeks for {selectedCourse?.name}
           </Dialog.Title>
-          
+
           <Flex direction="column" gap="3">
             <Flex gap="2" wrap="wrap">
-              <Button 
-                variant="soft" 
+              <Button
+                variant="soft"
                 onClick={handleSelectAllWeeks}
                 style={{ background: 'rgba(99, 102, 241, 0.2)' }}
               >
                 {formData.weeks.length === selectedCourse?.durationInWeeks ? 'Deselect All' : 'Select All'}
               </Button>
-              <Button 
-                variant="soft" 
+              <Button
+                variant="soft"
                 onClick={handleRandomWeeks}
                 style={{ background: 'rgba(139, 92, 246, 0.2)' }}
               >
@@ -726,18 +726,18 @@ export default function CreateContest() {
             </Grid>
 
             <Flex gap="2" justify="end" mt="2">
-              <Button 
-                variant="soft" 
+              <Button
+                variant="soft"
                 onClick={() => setShowWeekModal(false)}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={() => setShowWeekModal(false)}
                 disabled={formData.weeks.length === 0}
                 style={{
-                  background: formData.weeks.length > 0 
-                    ? 'linear-gradient(135deg, #667eea, #764ba2)' 
+                  background: formData.weeks.length > 0
+                    ? 'linear-gradient(135deg, #667eea, #764ba2)'
                     : 'rgba(100, 100, 100, 0.3)',
                   cursor: formData.weeks.length > 0 ? 'pointer' : 'not-allowed',
                 }}

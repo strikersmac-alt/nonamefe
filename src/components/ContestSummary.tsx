@@ -54,18 +54,16 @@ export default function ContestSummary() {
 
   const fetchContestSummary = async () => {
     try {
-      const token = Cookies.get('authToken');
-      if (!token) {
-        navigate('/');
-        return;
-      }
+      // const token = Cookies.get('authToken');
+      // if (!token) {
+      //   navigate('/');
+      //   return;
+      // }
 
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/summary`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          withCredentials: true,
         }
       );
 

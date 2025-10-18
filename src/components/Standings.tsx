@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar } from '@radix-ui/themes';
 import { HomeIcon, StarFilledIcon, CheckCircledIcon, StarIcon } from '@radix-ui/react-icons';
-import { io } from 'socket.io-client';
-import Cookies from 'js-cookie';
+import { io, Socket } from 'socket.io-client';
 import LoadingSpinner from './LoadingSpinner';
+import { useAuthStore } from '../store/authStore';
 import '../App.css';
 
 interface Standing {
@@ -32,11 +32,12 @@ export default function Standings() {
   const finalScore = location.state?.finalScore as number;
   const fromProfile = location.state?.fromProfile as boolean;
 
-  // const [socket, setSocket] = useState<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string>('');
   const [contestInfo, setContestInfo] = useState<{ isLive: boolean; totalParticipants: number; capacity: number } | null>(null);
+  const user = useAuthStore((state) => state.user);
+  const currentUserId = user?._id || '';
 
   // Prevent browser back button from going back to contest ONLY if user came from contest play
   // If finalScore exists and NOT from profile, it means user just completed the contest
@@ -59,26 +60,12 @@ export default function Standings() {
   }, [finalScore, fromProfile]);
 
   useEffect(() => {
-    const token = Cookies.get('authToken');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
-    // Get current user ID from token
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      setCurrentUserId(payload.userId);
-    } catch (err) {
-      // Silently handle token error
-    }
-
     // Initialize socket connection
     const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
-      auth: { token },
+      withCredentials: true,
     });
 
-    // setSocket(socketInstance);
+    setSocket(socketInstance);
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket, joining contest:', contestId);
@@ -154,12 +141,12 @@ export default function Standings() {
     }
   };
 
-  // const getRankIcon = (rank: number) => {
-  //   if (rank <= 3) {
-  //     return <StarIcon width={24} height={24} />;
-  //   }
-  //   return null;
-  // };
+  const getRankIcon = (rank: number) => {
+    if (rank <= 3) {
+      return <StarIcon width={24} height={24} />;
+    }
+    return null;
+  };
 
   const getMedalEmoji = (rank: number) => {
     switch (rank) {
@@ -178,7 +165,7 @@ export default function Standings() {
     return <LoadingSpinner message="Loading standings..." />;
   }
 
-  // const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
+  const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
 
   return (
     <Box style={{

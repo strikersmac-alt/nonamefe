@@ -3,8 +3,8 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar, Grid } from '@radix-ui/themes';
 import { PersonIcon, RocketIcon, CheckCircledIcon, ClockIcon, CopyIcon } from '@radix-ui/react-icons';
 import { io, Socket } from 'socket.io-client';
-import Cookies from 'js-cookie';
 import '../App.css';
+import { useAuthStore } from '../store/authStore';
 
 interface Participant {
   userId: string;
@@ -35,6 +35,7 @@ export default function WaitingRoom() {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     // Check if contest is already completed
@@ -48,25 +49,14 @@ export default function WaitingRoom() {
       return;
     }
 
-    const token = Cookies.get('authToken');
-    console.log("🍪 Frontend - Auth token from cookie:", token ? token.substring(0, 30) + '...' : 'NO TOKEN');
-    
-    if (!token) {
-      setError('Please sign in to join the contest');
-      setTimeout(() => navigate('/'), 2000);
-      return;
-    }
-
     // Decode JWT to get current user ID and check if admin
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentUserId = payload.userId;
+      const payload = user;
+      const currentUserId = payload?._id;
       
       console.log('🔍 Frontend - Decoded JWT payload:', {
-        userId: payload.userId,
-        email: payload.email,
-        iat: payload.iat,
-        exp: payload.exp
+        userId: payload?._id,
+        email: payload?.email
       });
       console.log('👤 Frontend - Current user ID:', currentUserId);
       console.log('🎯 Frontend - Contest admin ID:', contestMeta?.adminId);
@@ -84,7 +74,7 @@ export default function WaitingRoom() {
 
     // Initialize socket connection
     const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
-      auth: { token },
+      withCredentials: true,
     });
 
     setSocket(socketInstance);

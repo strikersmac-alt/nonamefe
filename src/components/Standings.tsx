@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar } from '@radix-ui/themes';
 import { HomeIcon, StarFilledIcon, CheckCircledIcon, StarIcon } from '@radix-ui/react-icons';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import Cookies from 'js-cookie';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';

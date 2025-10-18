@@ -2,7 +2,6 @@ import { Box, Flex, Heading, Text, Card, Grid, Container } from '@radix-ui/theme
 import { LightningBoltIcon, GlobeIcon, RocketIcon, MixIcon, ChatBubbleIcon, LayersIcon, ReaderIcon, MagicWandIcon } from '@radix-ui/react-icons';
 import '../App.css';
 import { useEffect, useState } from 'react';
-import { useAuthStore } from '../store/authStore';
 
 // Typing animation hook
 const useTypingEffect = (words: string[], typingSpeed = 150, deletingSpeed = 100, pauseDuration = 2000) => {
@@ -153,8 +152,6 @@ const FloatingOrbs = () => (
 
 export default function LandingPage() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const user = useAuthStore((state) => state.user);
-  console.log(user);
   // Typing animation for dynamic text
   const typingText = useTypingEffect([
     'competitive duels',

@@ -92,7 +92,7 @@ export default function CreateContest() {
   const fetchCourses = async () => {
     setCoursesLoading(true);
     try {
-      const response = await axios.get<{ courses: Course[] }>('http://localhost:10000/api/course/courses');
+      const response = await axios.get<{ courses: Course[] }>(`${import.meta.env.VITE_API_URL}/api/course/courses`);
       setCourses(response.data.courses);
     } catch (error) {
       console.error('Error fetching courses:', error);
@@ -175,7 +175,7 @@ export default function CreateContest() {
         };
 
         result = await axios.post<ApiResponse>(
-          'http://localhost:10000/api/quiz/createNptelContest',
+          `${import.meta.env.VITE_API_URL}/api/quiz/createNptelContest`,
           payload,
           {
             headers: {
@@ -197,7 +197,7 @@ export default function CreateContest() {
         };
 
         result = await axios.post<ApiResponse>(
-          'http://localhost:10000/api/quiz/createContest',
+          `${import.meta.env.VITE_API_URL}/api/quiz/createContest`,
           payload,
           {
             headers: {
@@ -212,7 +212,7 @@ export default function CreateContest() {
         // Automatically join the contest by fetching its metadata
         try {
           const contestResponse = await axios.get<{ success: boolean; meta: ContestMeta }>(
-            `http://localhost:10000/api/contest/code/${result.data.code}/questions`
+            `${import.meta.env.VITE_API_URL}/api/contest/code/${result.data.code}/questions`
           );
 
           if (contestResponse.data.success && contestResponse.data.meta) {

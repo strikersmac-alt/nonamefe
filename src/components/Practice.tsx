@@ -102,7 +102,7 @@ export default function Practice() {
         const weeksParam = newWeeks.join(',');
         const response = await axios.get<{ questions: Question[] }>(
           
-          `http://localhost:10000/api/nptel/questions/${selectedCourse?.code}?weeks=${weeksParam}`
+          `${import.meta.env.VITE_API_URL}/api/nptel/questions/${selectedCourse?.code}?weeks=${weeksParam}`
         );
         setQuestions(response.data.questions);
         setAvailableQuestions(response.data.questions.length);
@@ -118,7 +118,7 @@ export default function Practice() {
 
   const fetchCourses = async () => {
     try {
-      const response = await axios.get<{ courses: Course[] }>('http://localhost:10000/api/course/courses');
+      const response = await axios.get<{ courses: Course[] }>(`${import.meta.env.VITE_API_URL}/api/course/courses`);
       setCourses(response.data.courses);
     } catch (error) {
       setLoading(false);
@@ -148,7 +148,7 @@ export default function Practice() {
       try {
         const weeksParam = newWeeks.join(',');
         const response = await axios.get<{ questions: Question[] }>(
-          `http://localhost:10000/api/nptel/questions/${selectedCourse.code}?weeks=${weeksParam}`
+          `${import.meta.env.VITE_API_URL}/api/nptel/questions/${selectedCourse.code}?weeks=${weeksParam}`
         );
         const totalQuestions = response.data.questions.length;
         setAvailableQuestions(totalQuestions);
@@ -180,7 +180,7 @@ export default function Practice() {
     try {
       const weeksParam = selectedWeeks.join(',');
       const response = await axios.get<{ questions: Question[] }>(
-        `http://localhost:10000/api/nptel/questions/${selectedCourse.code}?weeks=${weeksParam}`
+        `${import.meta.env.VITE_API_URL}/api/nptel/questions/${selectedCourse.code}?weeks=${weeksParam}`
       );
 
       if (response.data.questions.length === 0) {

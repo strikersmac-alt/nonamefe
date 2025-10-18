@@ -12,7 +12,7 @@ const LogoutButton: React.FC = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await axios.post('http://localhost:10000/api/auth/logout', {}, { 
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {}, { 
         withCredentials: true 
       });
       logout();

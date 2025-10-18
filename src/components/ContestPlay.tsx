@@ -130,7 +130,7 @@ export default function ContestPlay() {
     const fetchQuestions = async () => {
       try {
         const response = await axios.get<{ success: boolean; questions: Question[] }>(
-          `http://localhost:10000/api/contest/${contestId}/questions`
+          `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`
         );
         
         if (response.data.success) {
@@ -154,7 +154,7 @@ export default function ContestPlay() {
       return;
     }
 
-    const socketInstance = io('http://localhost:10000', {
+    const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
       auth: { token },
     });
 

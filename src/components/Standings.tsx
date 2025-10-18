@@ -74,7 +74,7 @@ export default function Standings() {
     }
 
     // Initialize socket connection
-    const socketInstance = io('http://localhost:10000', {
+    const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
       auth: { token },
     });
 
@@ -122,7 +122,7 @@ export default function Standings() {
   useEffect(() => {
     const fetchContestInfo = async () => {
       try {
-        const response = await fetch(`http://localhost:10000/api/contest/${contestId}/questions`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`);
         const data = await response.json();
         if (data.success && data.meta) {
           setContestInfo({

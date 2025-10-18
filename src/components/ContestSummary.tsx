@@ -61,7 +61,7 @@ export default function ContestSummary() {
       }
 
       const response = await axios.get(
-        `http://localhost:10000/api/contest/${contestId}/summary`,
+        `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/summary`,
         {
           headers: {
             Authorization: `Bearer ${token}`

@@ -30,7 +30,7 @@ export default function JoinContest() {
     try {
       // Fetch contest details by code
       const response = await axios.get<{ success: boolean; meta: ContestMeta }>(
-        `http://localhost:10000/api/contest/code/${contestCode}/questions`
+        `${import.meta.env.VITE_API_URL}/api/contest/code/${contestCode}/questions`
       );
 
       if (response.data.success && response.data.meta) {

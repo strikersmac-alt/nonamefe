@@ -82,7 +82,7 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         const token = Cookies.get('authToken');
-        const response = await fetch('http://localhost:10000/api/profile', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

@@ -83,7 +83,7 @@ export default function WaitingRoom() {
     }
 
     // Initialize socket connection
-    const socketInstance = io('http://localhost:10000', {
+    const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
       auth: { token },
     });
 

@@ -15,7 +15,7 @@ const GoogleSignInButton: React.FC = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       const idToken = await user.getIdToken();
-      const response = await axios.post('http://localhost:10000/api/auth/google', { idToken }, { withCredentials: true });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, { idToken }, { withCredentials: true });
 
       if (response.data.success) {
         setUser({

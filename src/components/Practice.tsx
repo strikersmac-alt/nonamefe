@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField } from '@radix-ui/themes';
-import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, HomeIcon, LightningBoltIcon } from '@radix-ui/react-icons';
+import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon } from '@radix-ui/react-icons';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
@@ -47,7 +47,7 @@ interface TestResult {
 }
 
 export default function Practice() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -102,7 +102,7 @@ export default function Practice() {
         const weeksParam = newWeeks.join(',');
         const response = await axios.get<{ questions: Question[] }>(
           
-          `http://localhost:10000/api/nptel/questions/${selectedCourse.code}?weeks=${weeksParam}`
+          `http://localhost:10000/api/nptel/questions/${selectedCourse?.code}?weeks=${weeksParam}`
         );
         setQuestions(response.data.questions);
         setAvailableQuestions(response.data.questions.length);

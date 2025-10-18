@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog, Checkbox } from '@radix-ui/themes';
-import { RocketIcon, StarFilledIcon, CheckCircledIcon, CrossCircledIcon, ArrowLeftIcon, BookmarkIcon } from '@radix-ui/react-icons';
+import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import '../App.css';

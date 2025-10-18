@@ -1,5 +1,5 @@
-import { Box, Flex, Heading, Text, Card, Grid, Container, Badge } from '@radix-ui/themes';
-import { LightningBoltIcon, GlobeIcon, RocketIcon, StarFilledIcon, MixIcon, ChatBubbleIcon, LayersIcon, ReaderIcon, MagicWandIcon } from '@radix-ui/react-icons';
+import { Box, Flex, Heading, Text, Card, Grid, Container } from '@radix-ui/themes';
+import { LightningBoltIcon, GlobeIcon, RocketIcon, MixIcon, ChatBubbleIcon, LayersIcon, ReaderIcon, MagicWandIcon } from '@radix-ui/react-icons';
 import '../App.css';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/authStore';

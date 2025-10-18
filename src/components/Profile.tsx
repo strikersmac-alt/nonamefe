@@ -17,7 +17,6 @@ import {
   ReaderIcon,
   GlobeIcon
 } from '@radix-ui/react-icons';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';

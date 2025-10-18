@@ -1,4 +1,3 @@
-import React from 'react'
 import { useAuthStore } from '../store/authStore';
 import { Outlet, Navigate } from 'react-router-dom';
 export default function PrivateRoute() {

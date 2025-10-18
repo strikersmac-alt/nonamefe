@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge } from '@radix-ui/themes';
-import { HomeIcon, CheckCircledIcon, CrossCircledIcon, ClockIcon, ResetIcon, StarIcon } from '@radix-ui/react-icons';
+import { HomeIcon, CheckCircledIcon, CrossCircledIcon, ClockIcon, StarIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import LoadingSpinner from './LoadingSpinner';

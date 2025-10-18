@@ -32,7 +32,7 @@ export default function Standings() {
   const finalScore = location.state?.finalScore as number;
   const fromProfile = location.state?.fromProfile as boolean;
 
-  const [socket, setSocket] = useState<Socket | null>(null);
+  // const [socket, setSocket] = useState<Socket | null>(null);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string>('');
@@ -78,7 +78,7 @@ export default function Standings() {
       auth: { token },
     });
 
-    setSocket(socketInstance);
+    // setSocket(socketInstance);
 
     socketInstance.on('connect', () => {
       console.log('Connected to socket, joining contest:', contestId);
@@ -154,12 +154,12 @@ export default function Standings() {
     }
   };
 
-  const getRankIcon = (rank: number) => {
-    if (rank <= 3) {
-      return <StarIcon width={24} height={24} />;
-    }
-    return null;
-  };
+  // const getRankIcon = (rank: number) => {
+  //   if (rank <= 3) {
+  //     return <StarIcon width={24} height={24} />;
+  //   }
+  //   return null;
+  // };
 
   const getMedalEmoji = (rank: number) => {
     switch (rank) {
@@ -178,7 +178,7 @@ export default function Standings() {
     return <LoadingSpinner message="Loading standings..." />;
   }
 
-  const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
+  // const currentUserRank = standings.findIndex(s => s.userId === currentUserId) + 1;
 
   return (
     <Box style={{

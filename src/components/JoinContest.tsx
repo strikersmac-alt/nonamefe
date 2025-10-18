@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Badge } from '@radix-ui/themes';
-import { EnterIcon, StarFilledIcon, ArrowLeftIcon, RocketIcon } from '@radix-ui/react-icons';
+import { EnterIcon, StarFilledIcon, RocketIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import '../App.css';
 

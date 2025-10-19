@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar, Grid } from '@radix-ui/themes';
 import { PersonIcon, RocketIcon, CheckCircledIcon, ClockIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
 import { io, Socket } from 'socket.io-client';
+import axios from 'axios';
 import '../App.css';
 import { useAuthStore } from '../store/authStore';
 
@@ -21,6 +22,7 @@ interface ContestMeta {
   timeZone: string;
   id: string;
   adminId: string;
+  status?: string;
 }
 
 export default function WaitingRoom() {
@@ -49,6 +51,52 @@ export default function WaitingRoom() {
       });
       return;
     }
+
+    const checkContestStatus = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`
+        );
+        
+        if (response.data.success && response.data.meta) {
+          const meta = response.data.meta;
+          
+          if (meta.isLive) {
+            try {
+              const summaryResponse = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/summary`,
+                { withCredentials: true }
+              );
+              
+              if (summaryResponse.data.success) {
+                const userAnswers = summaryResponse.data.userAnswers || [];
+                
+                if (userAnswers.length > 0) {
+                  console.log('Contest is live and user has previous answers, redirecting to play...');
+                  navigate(`/contest/${contestId}/play`, { 
+                    state: { 
+                      contestMeta: { 
+                        ...meta,
+                        isLive: true 
+                      },
+                      resuming: true
+                    },
+                    replace: true
+                  });
+                  return;
+                }
+              }
+            } catch (summaryError) {
+              console.log('User has not started the contest yet');
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking contest status:', error);
+      }
+    };
+
+    checkContestStatus();
 
     // Decode JWT to get current user ID and check if admin
     try {
@@ -82,11 +130,14 @@ export default function WaitingRoom() {
 
     socketInstance.on('connect', () => {
       setConnected(true);
-      
+      console.log("here we go 1")
       // Join the contest room
       socketInstance.emit('joinContest', contestId, (response: any) => {
+        console.log(response);
         if (!response.success) {
+          console.log("here we go 2");
           setError(response.message || 'Failed to join contest');
+          console.log(response.message);
           // Don't redirect immediately, show error message
         }
       });
@@ -113,7 +164,7 @@ export default function WaitingRoom() {
     return () => {
       socketInstance.disconnect();
     };
-  }, [contestId, navigate, contestMeta]);
+  }, [contestId, navigate, contestMeta, user]);
 
   const handleStartContest = () => {
     if (socket && isAdmin) {

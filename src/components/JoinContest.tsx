@@ -122,7 +122,7 @@ export default function JoinContest() {
                 fontFamily: 'Poppins, sans-serif',
                 textAlign: 'center',
               }}>
-                Enter Contest Code
+                Enter Code
               </Heading>
 
               <Text size="3" as="p" style={{

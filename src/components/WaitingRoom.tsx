@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar, Grid } from '@radix-ui/themes';
-import { PersonIcon, RocketIcon, CheckCircledIcon, ClockIcon, CopyIcon } from '@radix-ui/react-icons';
+import { PersonIcon, RocketIcon, CheckCircledIcon, ClockIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
 import { io, Socket } from 'socket.io-client';
 import '../App.css';
 import { useAuthStore } from '../store/authStore';
@@ -35,6 +35,7 @@ export default function WaitingRoom() {
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
@@ -124,11 +125,58 @@ export default function WaitingRoom() {
     }
   };
 
-  const copyContestCode = () => {
+  const copyContestCode = async () => {
     if (contestMeta?.code) {
-      navigator.clipboard.writeText(contestMeta.code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      try {
+        await navigator.clipboard.writeText(contestMeta.code);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy code:', err);
+        // Fallback method
+        const textArea = document.createElement('textarea');
+        textArea.value = contestMeta.code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (fallbackErr) {
+          console.error('Fallback copy failed:', fallbackErr);
+        }
+        document.body.removeChild(textArea);
+      }
+    }
+  };
+
+  const copyContestLink = async () => {
+    if (contestMeta?.code) {
+      try {
+        const joinLink = `${window.location.origin}/join-contest?code=${contestMeta.code}`;
+        await navigator.clipboard.writeText(joinLink);
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy link:', err);
+        // Fallback method
+        const textArea = document.createElement('textarea');
+        textArea.value = `${window.location.origin}/join-contest?code=${contestMeta.code}`;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+          document.execCommand('copy');
+          setLinkCopied(true);
+          setTimeout(() => setLinkCopied(false), 2000);
+        } catch (fallbackErr) {
+          console.error('Fallback copy failed:', fallbackErr);
+        }
+        document.body.removeChild(textArea);
+      }
     }
   };
 
@@ -191,7 +239,7 @@ export default function WaitingRoom() {
                 border: '1px solid rgba(99, 102, 241, 0.3)',
                 padding: '0.75rem 1.5rem',
               }}>
-                <Flex align="center" gap="2">
+                <Flex align="center" gap="2" wrap="wrap">
                   <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.95)', fontWeight: 500 }}>Contest Code:</Text>
                   <Text size="4" weight="bold" style={{ 
                     fontFamily: 'monospace', 
@@ -200,14 +248,27 @@ export default function WaitingRoom() {
                   }}>
                     {contestMeta.code}
                   </Text>
-                  <Button
-                    size="1"
-                    variant="ghost"
-                    onClick={copyContestCode}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {copied ? <CheckCircledIcon color="green" /> : <CopyIcon />}
-                  </Button>
+                  <Flex gap="1">
+                    <Button
+                      size="1"
+                      variant="soft"
+                      onClick={copyContestCode}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {copied ? <CheckCircledIcon color="green" /> : <CopyIcon />}
+                      {copied ? 'Copied!' : 'Code'}
+                    </Button>
+                    <Button
+                      size="1"
+                      variant="soft"
+                      color="blue"
+                      onClick={copyContestLink}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {linkCopied ? <CheckCircledIcon color="green" /> : <Link2Icon />}
+                      {linkCopied ? 'Copied!' : 'Link'}
+                    </Button>
+                  </Flex>
                 </Flex>
               </Card>
 

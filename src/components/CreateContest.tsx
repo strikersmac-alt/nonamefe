@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog, Checkbox } from '@radix-ui/themes';
-import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon } from '@radix-ui/react-icons';
+import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import '../App.css';
 
@@ -57,6 +57,8 @@ export default function CreateContest() {
 
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<ApiResponse | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showWeekModal, setShowWeekModal] = useState(false);
@@ -629,24 +631,64 @@ export default function CreateContest() {
                       {response.message}
                     </Text>
                     {response.code && (
-                      <Box style={{
-                        background: 'rgba(16, 185, 129, 0.2)',
-                        padding: '1rem 2rem',
-                        borderRadius: '1rem',
-                        border: '1px solid rgba(16, 185, 129, 0.4)',
-                        marginTop: '0.5rem',
-                      }}>
-                        <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)', marginBottom: '0.25rem', display: 'block' }}>
-                          Contest Code:
-                        </Text>
-                        <Text size="8" weight="bold" style={{
-                          color: '#10b981',
-                          fontFamily: 'monospace',
-                          letterSpacing: '0.1em',
+                      <Flex direction="column" gap="3" style={{ width: '100%', marginTop: '0.5rem' }}>
+                        <Box style={{
+                          background: 'rgba(16, 185, 129, 0.2)',
+                          padding: '1rem 2rem',
+                          borderRadius: '1rem',
+                          border: '1px solid rgba(16, 185, 129, 0.4)',
                         }}>
-                          {response.code}
-                        </Text>
-                      </Box>
+                          <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)', marginBottom: '0.25rem', display: 'block' }}>
+                            Contest Code:
+                          </Text>
+                          <Text size="8" weight="bold" style={{
+                            color: '#10b981',
+                            fontFamily: 'monospace',
+                            letterSpacing: '0.1em',
+                          }}>
+                            {response.code}
+                          </Text>
+                        </Box>
+                        
+                        <Flex gap="2" wrap="wrap" justify="center">
+                          <Button
+                            size="3"
+                            variant="soft"
+                            onClick={() => {
+                              navigator.clipboard.writeText(response.code!);
+                              setCopied(true);
+                              setTimeout(() => setCopied(false), 2000);
+                            }}
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.2)',
+                              border: '1px solid rgba(16, 185, 129, 0.4)',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <CopyIcon />
+                            {copied ? 'Copied!' : 'Copy Code'}
+                          </Button>
+                          
+                          <Button
+                            size="3"
+                            variant="soft"
+                            onClick={() => {
+                              const joinLink = `${window.location.origin}/join-contest?code=${response.code}`;
+                              navigator.clipboard.writeText(joinLink);
+                              setLinkCopied(true);
+                              setTimeout(() => setLinkCopied(false), 2000);
+                            }}
+                            style={{
+                              background: 'rgba(59, 130, 246, 0.2)',
+                              border: '1px solid rgba(59, 130, 246, 0.4)',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <Link2Icon />
+                            {linkCopied ? 'Link Copied!' : 'Copy Link'}
+                          </Button>
+                        </Flex>
+                      </Flex>
                     )}
                   </>
                 ) : (
@@ -696,7 +738,7 @@ export default function CreateContest() {
               </Button>
             </Flex>
 
-            <Grid columns="4" gap="2">
+            <Grid columns="4" gap="2" style={{ width: '100%' }}>
               {selectedCourse && Array.from({ length: selectedCourse.durationInWeeks }, (_, i) => i + 1).map(week => (
                 <Card
                   key={week}
@@ -708,15 +750,22 @@ export default function CreateContest() {
                     border: formData.weeks.includes(week)
                       ? '2px solid rgba(99, 102, 241, 0.6)'
                       : '1px solid rgba(99, 102, 241, 0.2)',
-                    padding: '0.75rem',
+                    padding: '0.5rem',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
+                    minWidth: 0,
                   }}
                 >
-                  <Flex align="center" justify="center" gap="2">
-                    <Checkbox checked={formData.weeks.includes(week)} />
-                    <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                  <Flex align="center" justify="center" gap="1" style={{ minWidth: 0 }}>
+                    <Checkbox checked={formData.weeks.includes(week)} style={{ flexShrink: 0 }} />
+                    <Text size="1" weight="medium" style={{ 
+                      color: 'rgba(226, 232, 240, 0.95)',
+                      whiteSpace: 'nowrap',
+                      fontSize: 'clamp(0.7rem, 1.5vw, 0.875rem)',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
                       Week {week}
                     </Text>
                   </Flex>

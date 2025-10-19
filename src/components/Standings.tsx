@@ -148,18 +148,6 @@ export default function Standings() {
   //   return null;
   // };
 
-  const getMedalEmoji = (rank: number) => {
-    switch (rank) {
-      case 1:
-        return '🥇';
-      case 2:
-        return '🥈';
-      case 3:
-        return '🥉';
-      default:
-        return '';
-    }
-  };
 
   if (loading) {
     return <LoadingSpinner message="Loading standings..." />;
@@ -248,103 +236,49 @@ export default function Standings() {
           )}
         </Flex>
 
-        {/* Top 3 Podium */}
+        {/* Top 3 Winners - Simple List Style */}
         {standings.length >= 3 && (
-          <Flex justify="center" align="end" gap="4" mb="6" wrap="wrap">
-            {/* 2nd Place */}
-            <Box className="hero-card" style={{
-              width: '200px',
-              background: 'rgba(148, 163, 184, 0.15)',
-              borderRadius: '1.5rem',
-              boxShadow: '0 8px 32px 0 rgba(148, 163, 184, 0.3)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(148, 163, 184, 0.4)',
-              padding: '1.5rem',
-              textAlign: 'center',
-              animation: 'scaleIn 0.5s ease-out 0.2s both',
-            }}>
-              <Text size="6" style={{ marginBottom: '0.5rem' }}>{getMedalEmoji(2)}</Text>
-              <Avatar
-                size="5"
-                fallback={standings[1].name.charAt(0).toUpperCase()}
-                style={{
-                  background: getRankColor(2),
-                  margin: '0 auto 1rem',
-                }}
-              />
-              <Text size="3" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem' }}>
-                {standings[1].name}
-              </Text>
-              <Badge size="2" color="gray" variant="soft">
-                {standings[1].score} points
-              </Badge>
-            </Box>
-
-            {/* 1st Place */}
-            <Box className="hero-card" style={{
-              width: '220px',
-              background: 'rgba(251, 191, 36, 0.15)',
-              borderRadius: '1.5rem',
-              boxShadow: '0 12px 48px 0 rgba(251, 191, 36, 0.4)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(251, 191, 36, 0.6)',
-              padding: '2rem',
-              textAlign: 'center',
-              animation: 'scaleIn 0.5s ease-out both',
-              position: 'relative',
-            }}>
-              <div className="card-shine"></div>
-              <Text size="8" style={{ marginBottom: '0.5rem' }}>{getMedalEmoji(1)}</Text>
-              <Avatar
-                size="6"
-                fallback={standings[0].name.charAt(0).toUpperCase()}
-                style={{
-                  background: getRankColor(1),
-                  margin: '0 auto 1rem',
-                  boxShadow: '0 8px 24px rgba(251, 191, 36, 0.5)',
-                }}
-              />
-              <Text size="4" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem' }}>
-                {standings[0].name}
-              </Text>
-              <Badge size="2" style={{ background: getRankColor(1) }}>
-                <StarFilledIcon />
-                {standings[0].score} points
-              </Badge>
-            </Box>
-
-            {/* 3rd Place */}
-            <Box className="hero-card" style={{
-              width: '200px',
-              background: 'rgba(217, 119, 6, 0.15)',
-              borderRadius: '1.5rem',
-              boxShadow: '0 8px 32px 0 rgba(217, 119, 6, 0.3)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(217, 119, 6, 0.4)',
-              padding: '1.5rem',
-              textAlign: 'center',
-              animation: 'scaleIn 0.5s ease-out 0.4s both',
-            }}>
-              <Text size="6" style={{ marginBottom: '0.5rem' }}>{getMedalEmoji(3)}</Text>
-              <Avatar
-                size="5"
-                fallback={standings[2].name.charAt(0).toUpperCase()}
-                style={{
-                  background: getRankColor(3),
-                  margin: '0 auto 1rem',
-                }}
-              />
-              <Text size="3" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem' }}>
-                {standings[2].name}
-              </Text>
-              <Badge size="2" color="orange" variant="soft">
-                {standings[2].score} points
-              </Badge>
-            </Box>
-          </Flex>
+          <Box mb="6" style={{ maxWidth: '600px', margin: '0 auto 2rem' }}>
+            <Flex direction="column" gap="2">
+              {[standings[0], standings[1], standings[2]].map((standing, idx) => {
+                const rank = idx + 1;
+                const rankColors = {
+                  1: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.6)', text: 'rgba(251, 191, 36, 0.95)' },
+                  2: { bg: 'rgba(148, 163, 184, 0.15)', border: 'rgba(148, 163, 184, 0.6)', text: 'rgba(148, 163, 184, 0.95)' },
+                  3: { bg: 'rgba(217, 119, 6, 0.15)', border: 'rgba(217, 119, 6, 0.6)', text: 'rgba(217, 119, 6, 0.95)' }
+                };
+                const colors = rankColors[rank as 1 | 2 | 3];
+                
+                return (
+                  <Card key={standing.userId} style={{
+                    background: colors.bg,
+                    border: `2px solid ${colors.border}`,
+                    backdropFilter: 'blur(20px)',
+                    padding: '1rem',
+                  }}>
+                    <Flex align="center" gap="3">
+                      <Badge size="2" style={{ background: getRankColor(rank), fontWeight: 800, minWidth: '35px' }}>
+                        #{rank}
+                      </Badge>
+                      <Avatar size="3" fallback={standing.name.charAt(0).toUpperCase()} style={{ background: getRankColor(rank) }} />
+                      <Flex direction="column" style={{ flex: 1, minWidth: 0 }}>
+                        <Text size="3" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {standing.name}
+                        </Text>
+                      </Flex>
+                      <Text size="4" weight="bold" style={{ color: colors.text, minWidth: '60px', textAlign: 'right' }}>
+                        {standing.score}
+                      </Text>
+                    </Flex>
+                  </Card>
+                );
+              })}
+            </Flex>
+          </Box>
         )}
 
-        {/* Full Standings List */}
+        {/* Other Participants List - Only show if more than 3 participants */}
+        {standings.length > 3 && (
         <Box className="hero-card" style={{
           width: '100%',
           maxWidth: '800px',
@@ -354,18 +288,18 @@ export default function Standings() {
           boxShadow: '0 8px 64px 0 rgba(8, 36, 73, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(20px)',
           border: '1.5px solid rgba(49, 84, 130, 0.4)',
-          padding: '2rem',
+          padding: window.innerWidth < 768 ? '1rem' : '1.5rem',
           position: 'relative',
         }}>
           <div className="card-shine"></div>
 
           <Heading size="5" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '1.5rem' }}>
-            All Participants
+            Other Participants
           </Heading>
 
-          <Flex direction="column" gap="3">
-            {standings.map((standing, index) => {
-              const rank = index + 1;
+          <Flex direction="column" gap="2">
+            {standings.slice(3).map((standing, index) => {
+              const rank = index + 4;
               const isCurrentUser = standing.userId === currentUserId;
 
               return (
@@ -375,84 +309,36 @@ export default function Standings() {
                   style={{
                     background: isCurrentUser
                       ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
-                      : rank <= 3
-                      ? 'linear-gradient(135deg, rgba(15, 29, 49, 0.9) 0%, rgba(20, 35, 60, 0.7) 100%)'
                       : 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
                     border: isCurrentUser
                       ? '2px solid rgba(99, 102, 241, 0.6)'
                       : '1px solid rgba(99, 102, 241, 0.2)',
                     backdropFilter: 'blur(10px)',
-                    padding: '1.25rem',
+                    padding: '0.875rem',
                     transition: 'all 0.3s ease',
                   }}
                 >
-                  <Flex align="center" gap="4">
-                    {/* Rank */}
-                    <Box style={{
-                      width: '50px',
-                      height: '50px',
-                      borderRadius: '50%',
-                      background: getRankColor(rank),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 800,
-                      fontSize: '1.25rem',
-                      color: 'white',
-                      flexShrink: 0,
-                      boxShadow: rank <= 3 ? '0 4px 12px rgba(0, 0, 0, 0.3)' : 'none',
-                    }}>
-                      {rank <= 3 ? getMedalEmoji(rank) : rank}
-                    </Box>
-
-                    {/* Avatar */}
-                    <Avatar
-                      size="4"
-                      fallback={standing.name.charAt(0).toUpperCase()}
-                      style={{
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                      }}
-                    />
-
-                    {/* Name */}
-                    <Flex direction="column" style={{ flex: 1 }}>
-                      <Text size="4" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                  <Flex align="center" gap="2">
+                    <Badge size="2" style={{ background: getRankColor(rank), fontWeight: 700, minWidth: '32px', flexShrink: 0 }}>
+                      #{rank}
+                    </Badge>
+                    <Avatar size="2" fallback={standing.name.charAt(0).toUpperCase()} style={{ background: 'linear-gradient(135deg, #667eea, #764ba2)', flexShrink: 0 }} />
+                    <Flex direction="column" style={{ flex: 1, minWidth: 0 }}>
+                      <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {standing.name}
-                        {isCurrentUser && (
-                          <Badge size="1" color="violet" variant="soft" style={{ marginLeft: '0.5rem' }}>
-                            You
-                          </Badge>
-                        )}
-                      </Text>
-                      <Text size="2" style={{ color: 'rgba(148, 163, 184, 0.7)' }}>
-                        Rank #{rank}
+                        {isCurrentUser && <Badge size="1" color="violet" variant="soft" style={{ marginLeft: '0.5rem' }}>You</Badge>}
                       </Text>
                     </Flex>
-
-                    {/* Score */}
-                    <Box style={{
-                      background: 'rgba(99, 102, 241, 0.2)',
-                      borderRadius: '1rem',
-                      padding: '0.75rem 1.5rem',
-                      textAlign: 'center',
-                    }}>
-                      <Text size="5" weight="bold" style={{
-                        background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                      }}>
-                        {standing.score}
-                      </Text>
-                      <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)', display: 'block' }}>
-                        points
-                      </Text>
-                    </Box>
+                    <Text size="3" weight="bold" style={{ background: 'linear-gradient(135deg, #60a5fa, #a78bfa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', minWidth: '50px', textAlign: 'right', flexShrink: 0 }}>
+                      {standing.score}
+                    </Text>
                   </Flex>
                 </Card>
               );
             })}
           </Flex>
         </Box>
+        )}
 
         {/* Action Buttons */}
         <Flex justify="center" gap="4" mt="6" wrap="wrap">

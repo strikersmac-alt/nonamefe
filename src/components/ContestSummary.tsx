@@ -285,8 +285,14 @@ export default function ContestSummary() {
                   padding: '1.5rem',
                 }}>
                   <Flex direction="column" gap="3">
-                    <Flex justify="between" align="start" gap="3">
-                      <Text weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)', flex: 1 }}>
+                    <Flex justify="between" align="start" gap="3" wrap="wrap">
+                      <Text weight="bold" style={{ 
+                        color: 'rgba(226, 232, 240, 0.95)', 
+                        flex: 1,
+                        minWidth: 0,
+                        wordBreak: 'break-word',
+                        overflowWrap: 'break-word',
+                      }}>
                         Q{index + 1}. {question.statement}
                       </Text>
                       <Flex gap="2" align="center" style={{ flexShrink: 0 }}>
@@ -323,25 +329,26 @@ export default function ContestSummary() {
                               : 'rgba(15, 23, 42, 0.5)',
                             border: `1px solid ${isCorrectOption ? 'rgba(34, 197, 94, 0.4)' : isUserSelected ? 'rgba(239, 68, 68, 0.4)' : 'rgba(99, 102, 241, 0.2)'}`,
                           }}>
-                            <Flex gap="2" align="center">
-                              <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.95)', flex: 1 }}>
+                            <Flex direction="column" gap="2">
+                              <Text size="2" style={{ 
+                                color: 'rgba(226, 232, 240, 0.95)',
+                                wordBreak: 'break-word',
+                                overflowWrap: 'break-word',
+                              }}>
                                 {option}
                               </Text>
-                              {isCorrectOption && (
-                                <Badge size="1" color="green" variant="soft">
-                                  <CheckCircledIcon /> Correct Answer
-                                </Badge>
-                              )}
-                              {isUserSelected && !isCorrectOption && (
-                                <Badge size="1" color="red" variant="soft">
-                                  <CrossCircledIcon /> Your Answer
-                                </Badge>
-                              )}
-                              {isUserSelected && isCorrectOption && (
-                                <Badge size="1" color="green" variant="soft">
-                                  Your Answer
-                                </Badge>
-                              )}
+                              <Flex gap="2" wrap="wrap">
+                                {isCorrectOption && (
+                                  <Badge size="1" color="green" variant="soft" style={{ flexShrink: 0 }}>
+                                    <CheckCircledIcon /> Correct Answer
+                                  </Badge>
+                                )}
+                                {isUserSelected && !isCorrectOption && (
+                                  <Badge size="1" color="red" variant="soft" style={{ flexShrink: 0 }}>
+                                    <CrossCircledIcon /> Your Answer
+                                  </Badge>
+                                )}
+                              </Flex>
                             </Flex>
                           </Box>
                         );

@@ -1,11 +1,19 @@
 @import "../node_modules/@radix-ui/themes/styles.css";
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
+/* Box-sizing reset for all elements */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* Global modern background */
 html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 body {
@@ -21,6 +29,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  width: 100%;
+  position: relative;
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
 }
 
@@ -120,4 +130,36 @@ a {
   outline: 2px solid var(--primary-blue);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Toast customization */
+.Toastify__toast-container {
+  width: 280px !important;
+}
+
+.Toastify__toast {
+  width: 100% !important;
+  min-height: 48px !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Fix mobile animation - prevent sliding from right to left */
+@media only screen and (max-width: 768px) {
+  .Toastify__toast-container--top-right {
+    right: 1rem !important;
+    left: auto !important;
+    top: 4rem !important;
+  }
+  
+  .Toastify__toast {
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* Responsive podium display */
+@media only screen and (max-width: 640px) {
+  /* Ensure podium stays in horizontal row on mobile */
+  .Toastify__toast-container--top-right {
+    width: 260px !important;
+  }
 }

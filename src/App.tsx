@@ -30,9 +30,6 @@ export default function App() {
 				pauseOnHover={false}
 				limit={1}
 				theme="dark"
-				style={{
-					marginTop: '4rem',
-				}}
 			/>
 			<Routes>
 				<Route path="/" element={<LandingPage />} />

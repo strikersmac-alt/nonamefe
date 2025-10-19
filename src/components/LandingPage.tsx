@@ -210,11 +210,13 @@ export default function LandingPage() {
             <div className="card-shine"></div>
 
 
-            <Heading size="9" className="glow-text-enhanced" style={{
+            <Heading size={{ initial: '7', sm: '8', md: '9' }} className="glow-text-enhanced" style={{
               letterSpacing: '-0.02em',
               fontWeight: 800,
               marginBottom: '0.5rem',
               fontFamily: 'Poppins, sans-serif',
+              whiteSpace: 'nowrap',
+              fontSize: 'clamp(2.5rem, 8vw, 4rem)',
             }}>
               MindMuse
             </Heading>

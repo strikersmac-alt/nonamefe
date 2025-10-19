@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField } from '@radix-ui/themes';
-import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon } from '@radix-ui/react-icons';
+import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
@@ -590,28 +590,28 @@ export default function Practice() {
           {/* Question Card */}
           <Box className="hero-card" style={{
             width: '100%',
-            maxWidth: '900px',
+            maxWidth: '800px',
             margin: '0 auto',
             background: 'rgba(35, 54, 85, 0.35)',
-            borderRadius: '2rem',
+            borderRadius: '1.5rem',
             boxShadow: '0 8px 64px 0 rgba(8, 36, 73, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
             backdropFilter: 'blur(20px)',
             border: '1.5px solid rgba(49, 84, 130, 0.4)',
-            padding: '2.5rem',
+            padding: '1.75rem',
             position: 'relative',
           }}>
             <div className="card-shine"></div>
 
-            <Flex direction="column" gap="5">
+            <Flex direction="column" gap="4">
               {/* Week Badge */}
               <Badge size="2" color="cyan" variant="soft" style={{ width: 'fit-content' }}>
                 Week {currentQuestion.week}
               </Badge>
 
               {/* Question Statement */}
-              <Heading size="6" style={{
+              <Heading size="5" style={{
                 color: 'rgba(226, 232, 240, 0.95)',
-                lineHeight: 1.6,
+                lineHeight: 1.5,
                 fontFamily: 'Poppins, sans-serif',
               }}>
                 {currentQuestion.ps}
@@ -628,7 +628,7 @@ export default function Practice() {
               </Badge>
 
               {/* Answer Options */}
-              <Flex direction="column" gap="3" mt="2">
+              <Flex direction="column" gap="2" mt="1">
                 {currentQuestion.options.map((option, index) => {
                   const isMultiSelect = currentQuestion.correct.length > 1;
                   return (
@@ -644,7 +644,7 @@ export default function Practice() {
                           ? '2px solid rgba(99, 102, 241, 0.6)'
                           : '1px solid rgba(99, 102, 241, 0.2)',
                         backdropFilter: 'blur(10px)',
-                        padding: '1.5rem',
+                        padding: '1rem',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
                       }}
@@ -673,66 +673,88 @@ export default function Practice() {
           </Box>
 
           {/* Navigation */}
-          <Flex justify="between" align="center" mt="6" wrap="wrap" gap="3">
+          <Flex justify="center" align="center" mt="4" wrap="nowrap" gap="3" style={{ width: '100%' }}>
             <Button
               disabled={currentQuestionIndex === 0}
               onClick={handlePreviousQuestion}
               variant="soft"
+              size="3"
               style={{
                 background: 'rgba(99, 102, 241, 0.2)',
                 backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(99, 102, 241, 0.3)',
+                borderRadius: '0.7rem',
+                minWidth: '48px',
               }}
             >
-              Previous
+              <ChevronLeftIcon width="18" height="18" />
             </Button>
             
-            <Flex gap="2" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-              {questions.map((_, index) => (
-                <Box
-                  key={index}
-                  style={{
-                    width: '12px',
-                    height: '12px',
-                    borderRadius: '50%',
-                    background: index === currentQuestionIndex ? '#667eea' : 
-                               answers.has(questions[index]._id) ? '#4ade80' : 'rgba(148, 163, 184, 0.3)',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    border: index === currentQuestionIndex ? '2px solid #667eea' : 'none',
-                  }}
-                  onClick={() => {
-                    const currentQ = questions[currentQuestionIndex];
-                    const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
-                    const newTimings = new Map(questionTimings);
-                    newTimings.set(currentQ._id, (newTimings.get(currentQ._id) || 0) + timeTaken);
-                    setQuestionTimings(newTimings);
-                    setCurrentQuestionIndex(index);
-                    setQuestionStartTime(Date.now());
-                  }}
-                />
-              ))}
-            </Flex>
+            <Box style={{ 
+              flex: 1, 
+              maxWidth: '600px',
+              overflowX: 'auto',
+              overflowY: 'hidden',
+              padding: '4px 0',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(99, 102, 241, 0.5) transparent',
+              display: 'flex',
+              justifyContent: 'center',
+            }}>
+              <Flex gap="2" style={{ flexWrap: 'nowrap', minWidth: 'max-content' }}>
+                {questions.map((_, index) => (
+                  <Box
+                    key={index}
+                    style={{
+                      width: '12px',
+                      height: '12px',
+                      borderRadius: '50%',
+                      background: index === currentQuestionIndex ? '#667eea' : 
+                                 answers.has(questions[index]._id) ? '#4ade80' : 'rgba(148, 163, 184, 0.3)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      border: index === currentQuestionIndex ? '2px solid #667eea' : 'none',
+                      flexShrink: 0,
+                    }}
+                    onClick={() => {
+                      const currentQ = questions[currentQuestionIndex];
+                      const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
+                      const newTimings = new Map(questionTimings);
+                      newTimings.set(currentQ._id, (newTimings.get(currentQ._id) || 0) + timeTaken);
+                      setQuestionTimings(newTimings);
+                      setCurrentQuestionIndex(index);
+                      setQuestionStartTime(Date.now());
+                    }}
+                  />
+                ))}
+              </Flex>
+            </Box>
 
             {currentQuestionIndex === questions.length - 1 ? (
               <Button 
                 onClick={handleTestEnd}
+                size="3"
                 style={{
                   background: 'linear-gradient(135deg, #667eea, #764ba2)',
                   fontWeight: 600,
+                  borderRadius : '0.7rem',
+                  minWidth: '48px',
                 }}
               >
-                Submit Test
+                <CheckCircledIcon width="18" height="18" />
               </Button>
             ) : (
               <Button 
                 onClick={handleNextQuestion}
+                size="3"
                 style={{
                   background: 'linear-gradient(135deg, #667eea, #764ba2)',
                   fontWeight: 600,
+                  borderRadius: '0.7rem',
+                  minWidth: '48px',
                 }}
               >
-                Next
+                <ChevronRightIcon width="18" height="18" />
               </Button>
             )}
           </Flex>

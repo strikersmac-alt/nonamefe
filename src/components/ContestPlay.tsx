@@ -477,19 +477,19 @@ export default function ContestPlay() {
         {/* Question Card */}
         <Box className="hero-card" style={{
           width: '100%',
-          maxWidth: '900px',
+          maxWidth: '800px',
           margin: '0 auto',
           background: 'rgba(35, 54, 85, 0.35)',
           borderRadius: '1.5rem',
           boxShadow: '0 8px 64px 0 rgba(8, 36, 73, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
           backdropFilter: 'blur(20px)',
           border: '1.5px solid rgba(49, 84, 130, 0.4)',
-          padding: '1.5rem',
+          padding: window.innerWidth < 768 ? '1.25rem' : '1.75rem',
           position: 'relative',
         }}>
           <div className="card-shine"></div>
 
-          <Flex direction="column" gap="3">
+          <Flex direction="column" gap="4">
             {/* Topic Badge */}
             <Badge size="2" color="cyan" variant="soft" style={{ width: 'fit-content' }}>
               {currentQuestion.topic}
@@ -531,7 +531,7 @@ export default function ContestPlay() {
                         ? '2px solid rgba(99, 102, 241, 0.6)'
                         : '1px solid rgba(99, 102, 241, 0.2)',
                       backdropFilter: 'blur(10px)',
-                      padding: '1.5rem',
+                      padding: '1rem',
                       cursor: submitting ? 'not-allowed' : 'pointer',
                       transition: 'all 0.3s ease',
                       opacity: submitting ? 0.7 : 1,

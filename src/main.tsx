@@ -5,6 +5,7 @@ import App from './App.tsx'
 import { Theme } from '@radix-ui/themes'
 import React, { useEffect, useState } from 'react';
 import { validateUser } from './store/authStore.ts';
+import LoadingSpinner from './components/LoadingSpinner.tsx';
 
 const RootWrapper: React.FC = () => {
   const [isValidated, setIsValidated] = useState(false);
@@ -18,7 +19,7 @@ const RootWrapper: React.FC = () => {
   }, []);
 
   if (!isValidated) {
-    return <div>Loading...</div>; 
+    return <LoadingSpinner message="" />; 
   }
 
   return (

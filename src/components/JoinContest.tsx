@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Badge } from '@radix-ui/themes';
 import { EnterIcon, StarFilledIcon, RocketIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
@@ -18,9 +18,18 @@ interface ContestMeta {
 
 export default function JoinContest() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [contestCode, setContestCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-fill contest code from URL parameter
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('code');
+    if (codeFromUrl) {
+      setContestCode(codeFromUrl);
+    }
+  }, [searchParams]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();

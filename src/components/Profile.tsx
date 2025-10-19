@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text, Card, Grid, Container, Badge, Avatar } from '@radix-ui/themes';
+import { Box, Flex, Heading, Text, Card, Grid, Container, Badge, Avatar, Button } from '@radix-ui/themes';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
@@ -15,7 +15,9 @@ import {
   BadgeIcon,
   LightningBoltIcon,
   ReaderIcon,
-  GlobeIcon
+  GlobeIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from '@radix-ui/react-icons';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
@@ -71,6 +73,10 @@ export default function Profile() {
   const [insights, setInsights] = useState<Insights | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalContests, setTotalContests] = useState(0);
+  const contestsPerPage = 10;
 
   useEffect(() => {
     if (!user) {
@@ -78,10 +84,11 @@ export default function Profile() {
       return;
     }
 
-    const fetchProfile = async () => {
+    const fetchProfile = async (page = 1) => {
+      setLoading(true);
       try {
         // const token = Cookies.get('authToken');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile?page=${page}&limit=${contestsPerPage}`, {
           method: 'GET',
           headers: {
             // 'Authorization': `Bearer ${token}`,
@@ -97,8 +104,11 @@ export default function Profile() {
         const data = await response.json();
         if (data.success) {
           setProfile(data.profile);
-          setContestHistory(data.contestHistory);
+          setContestHistory(data.contestHistory || []);
           setInsights(data.insights);
+          setTotalPages(data.pagination?.totalPages || 1);
+          setTotalContests(data.pagination?.totalContests || 0);
+          setCurrentPage(data.pagination?.currentPage || 1);
         } else {
           setError(data.message || 'Failed to load profile');
         }
@@ -109,8 +119,8 @@ export default function Profile() {
       }
     };
 
-    fetchProfile();
-  }, [user, navigate]);
+    fetchProfile(currentPage);
+  }, [user, navigate, currentPage]);
 
   const getModeColor = (mode: string) => {
     switch (mode) {
@@ -409,6 +419,12 @@ export default function Profile() {
           </Flex>
         </Heading>
 
+        {totalContests > 0 && (
+          <Text size="2" mb="3" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>
+            Showing {((currentPage - 1) * contestsPerPage) + 1} - {Math.min(currentPage * contestsPerPage, totalContests)} of {totalContests} contests
+          </Text>
+        )}
+
         {contestHistory.length === 0 ? (
           <Card style={{
             background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
@@ -511,6 +527,72 @@ export default function Profile() {
               </Card>
             ))}
           </Grid>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <Flex justify="center" align="center" gap="3" mt="6">
+            <Button
+              size="3"
+              variant="soft"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              style={{
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                opacity: currentPage === 1 ? 0.5 : 1,
+              }}
+            >
+              <ChevronLeftIcon />
+              Previous
+            </Button>
+
+            <Flex gap="2" align="center">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+
+                return (
+                  <Button
+                    key={pageNum}
+                    size="2"
+                    variant={currentPage === pageNum ? 'solid' : 'soft'}
+                    onClick={() => setCurrentPage(pageNum)}
+                    style={{
+                      minWidth: '40px',
+                      cursor: 'pointer',
+                      background: currentPage === pageNum
+                        ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                        : 'rgba(99, 102, 241, 0.2)',
+                    }}
+                  >
+                    {pageNum}
+                  </Button>
+                );
+              })}
+            </Flex>
+
+            <Button
+              size="3"
+              variant="soft"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              style={{
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                opacity: currentPage === totalPages ? 0.5 : 1,
+              }}
+            >
+              Next
+              <ChevronRightIcon />
+            </Button>
+          </Flex>
         )}
       </Container>
     </Box>

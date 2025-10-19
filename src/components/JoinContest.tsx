@@ -140,7 +140,7 @@ export default function JoinContest() {
                   <Box>
                     <TextField.Root
                       size="3"
-                      placeholder="Enter 6-digit code"
+                      placeholder="Enter code"
                       value={contestCode}
                       onChange={(e) => setContestCode(e.target.value.toUpperCase())}
                       required

@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge, Avatar } from '@radix-ui/themes';
 import { HomeIcon, StarFilledIcon, CheckCircledIcon, StarIcon } from '@radix-ui/react-icons';
 import { io } from 'socket.io-client';
+import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import { useAuthStore } from '../store/authStore';
 import '../App.css';
@@ -32,17 +33,13 @@ export default function Standings() {
   const finalScore = location.state?.finalScore as number;
   const fromProfile = location.state?.fromProfile as boolean;
 
-  // const [socket, setSocket] = useState<Socket | null>(null);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
   const [contestInfo, setContestInfo] = useState<{ isLive: boolean; totalParticipants: number; capacity: number } | null>(null);
   const user = useAuthStore((state) => state.user);
   const currentUserId = user?._id || '';
 
-  // Prevent browser back button from going back to contest ONLY if user came from contest play
-  // If finalScore exists and NOT from profile, it means user just completed the contest
   useEffect(() => {
-    // Only block back navigation if user came from contest (has finalScore) and NOT from Profile
     if (finalScore !== undefined && !fromProfile) {
       window.history.pushState(null, '', window.location.href);
       
@@ -56,77 +53,122 @@ export default function Standings() {
         window.removeEventListener('popstate', handlePopState);
       };
     }
-    // If fromProfile is true or no finalScore, allow normal back navigation
   }, [finalScore, fromProfile]);
 
   useEffect(() => {
-    // Initialize socket connection
-    const socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
-      withCredentials: true,
-    });
+    let socketInstance: any = null;
+    let socketTimeout: number | undefined;
+    
+    const initializeStandings = async () => {
+      try {
+        const infoResponse = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`
+        );
+        
+        const isLive = infoResponse.data.meta?.isLive;
+        
+        setContestInfo({
+          isLive: isLive || false,
+          totalParticipants: 0,
+          capacity: 0
+        });
 
-    // setSocket(socketInstance);
-
-    socketInstance.on('connect', () => {
-      console.log('Connected to socket, joining contest:', contestId);
-      // Join contest room to receive standings updates
-      socketInstance.emit('joinContest', contestId, (response: any) => {
-        console.log('Join contest response:', response);
-        if (response.success) {
+        if (!isLive || fromProfile) {
+          console.log('Contest ended or viewing from profile - using REST API for standings');
+          
+          const standingsResponse = await axios.get(
+            `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
+          );
+          
+          if (standingsResponse.data.success) {
+            setStandings(standingsResponse.data.standings);
+          }
           setLoading(false);
         } else {
-          // Even if join fails (contest ended), still show standings
-          setLoading(false);
-        }
-      });
-    });
+          console.log('Contest is live - using socket for real-time standings');
+          
+          socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
+            withCredentials: true,
+          });
 
-    socketInstance.on('updateStandings', (updatedStandings: Standing[]) => {
-      console.log('Received standings:', updatedStandings);
-      setStandings(updatedStandings);
-      setLoading(false);
-    });
+          // Set a timeout to fetch standings via REST if socket takes too long
+          socketTimeout = setTimeout(async () => {
+            console.log('Socket timeout - fetching standings via REST API');
+            try {
+              const restResponse = await axios.get(
+                `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
+              );
+              if (restResponse.data.success && restResponse.data.standings) {
+                setStandings(restResponse.data.standings);
+              }
+              setLoading(false);
+            } catch (err) {
+              console.error('Timeout REST API fallback failed:', err);
+              setLoading(false);
+            }
+          }, 3000); // 3 second timeout
 
-    // Set initial contest info from contestMeta if available
-    if (contestMeta) {
-      setContestInfo({
-        isLive: contestMeta.isLive,
-        totalParticipants: 0,
-        capacity: 0
-      });
-    }
+          socketInstance.on('connect', () => {
+            console.log('Connected to socket, joining contest:', contestId);
+            socketInstance.emit('joinContest', contestId, async (response: any) => {
+              console.log('Join contest response:', response);
+              
+              // Request initial standings after joining
+              socketInstance.emit('getStandings', contestId, async (standingsResponse: any) => {
+                console.log('Initial standings response:', standingsResponse);
+                clearTimeout(socketTimeout); // Clear timeout since we got response
+                
+                if (standingsResponse.success && standingsResponse.standings) {
+                  setStandings(standingsResponse.standings);
+                  setLoading(false);
+                } else {
+                  // Fallback to REST API if socket method fails
+                  console.log('Socket standings failed, using REST API fallback');
+                  try {
+                    const restResponse = await axios.get(
+                      `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
+                    );
+                    if (restResponse.data.success) {
+                      setStandings(restResponse.data.standings);
+                    }
+                  } catch (err) {
+                    console.error('REST API fallback failed:', err);
+                  }
+                  setLoading(false);
+                }
+              });
+            });
+          });
 
-    socketInstance.on('connect_error', () => {
-      setLoading(false);
-    });
+          socketInstance.on('updateStandings', (updatedStandings: Standing[]) => {
+            console.log('Received updated standings:', updatedStandings);
+            if (updatedStandings && Array.isArray(updatedStandings)) {
+              setStandings(updatedStandings);
+              setLoading(false);
+            }
+          });
 
-    return () => {
-      socketInstance.disconnect();
-    };
-  }, [contestId, navigate, contestMeta]);
-
-  // Fetch contest info to get latest isLive status
-  useEffect(() => {
-    const fetchContestInfo = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`);
-        const data = await response.json();
-        if (data.success && data.meta) {
-          setContestInfo({
-            isLive: data.meta.isLive,
-            totalParticipants: standings.length,
-            capacity: 0
+          socketInstance.on('connect_error', () => {
+            setLoading(false);
           });
         }
       } catch (error) {
-        console.error('Error fetching contest info:', error);
+        console.error('Error initializing standings:', error);
+        setLoading(false);
       }
     };
 
-    if (contestId) {
-      fetchContestInfo();
-    }
-  }, [contestId, standings]);
+    initializeStandings();
+
+    return () => {
+      if (socketTimeout) {
+        clearTimeout(socketTimeout);
+      }
+      if (socketInstance) {
+        socketInstance.disconnect();
+      }
+    };
+  }, [contestId, fromProfile]);
 
   const getRankColor = (rank: number) => {
     switch (rank) {
@@ -148,6 +190,8 @@ export default function Standings() {
   //   return null;
   // };
 
+
+  console.log('Standings render - loading:', loading, 'standings:', standings, 'length:', standings.length);
 
   if (loading) {
     return <LoadingSpinner message="Loading standings..." />;
@@ -237,10 +281,10 @@ export default function Standings() {
         </Flex>
 
         {/* Top 3 Winners - Simple List Style */}
-        {standings.length >= 3 && (
+        {standings.length > 0 ? (
           <Box mb="6" style={{ maxWidth: '600px', margin: '0 auto 2rem' }}>
             <Flex direction="column" gap="2">
-              {[standings[0], standings[1], standings[2]].map((standing, idx) => {
+              {standings.slice(0, 3).map((standing, idx) => {
                 const rank = idx + 1;
                 const rankColors = {
                   1: { bg: 'rgba(251, 191, 36, 0.15)', border: 'rgba(251, 191, 36, 0.6)', text: 'rgba(251, 191, 36, 0.95)' },
@@ -275,6 +319,18 @@ export default function Standings() {
               })}
             </Flex>
           </Box>
+        ) : (
+          <Card style={{
+            background: 'rgba(35, 54, 85, 0.35)',
+            padding: '2rem',
+            textAlign: 'center',
+            maxWidth: '600px',
+            margin: '0 auto 2rem',
+          }}>
+            <Text size="3" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>
+              No standings available yet. Waiting for participants to submit their answers...
+            </Text>
+          </Card>
         )}
 
         {/* Other Participants List - Only show if more than 3 participants */}

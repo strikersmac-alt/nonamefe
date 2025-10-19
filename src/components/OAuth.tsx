@@ -36,7 +36,7 @@ const GoogleSignInButton: React.FC = () => {
   return (
     <Button size="3" variant="soft" className="glass card-hover" onClick={handleGoogleSignIn}>
       <FcGoogle />
-      Sign in with Google
+      Sign in
     </Button>
   );
 };

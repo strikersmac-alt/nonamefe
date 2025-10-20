@@ -68,6 +68,7 @@ export default function Practice() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [questionTimings, setQuestionTimings] = useState<Map<string, number>>(new Map());
+  const [shuffledOptions, setShuffledOptions] = useState<Map<string, string[]>>(new Map());
   
   // Analysis state
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -212,7 +213,15 @@ export default function Practice() {
         shuffled = shuffled.slice(0, questionLimit);
       }
       
+      // Shuffle options for each question
+      const optionsMap = new Map<string, string[]>();
+      shuffled.forEach(question => {
+        const shuffledOpts = [...question.options].sort(() => Math.random() - 0.5);
+        optionsMap.set(question._id, shuffledOpts);
+      });
+      
       setQuestions(shuffled);
+      setShuffledOptions(optionsMap);
       setTestActive(true);
       setShowModal(false);
       setTimeRemaining(duration * 60);
@@ -511,7 +520,7 @@ export default function Practice() {
                       </Flex>
                       
                       <Flex direction="column" gap="2">
-                        {question.options.map((option, optIndex) => {
+                        {(shuffledOptions.get(question._id) || question.options).map((option, optIndex) => {
                           const isCorrect = question.correct.includes(option);
                           const isSelected = answer.selectedOptions.includes(option);
                           return (
@@ -651,7 +660,7 @@ export default function Practice() {
 
               {/* Answer Options */}
               <Flex direction="column" gap="2" mt="1">
-                {currentQuestion.options.map((option, index) => {
+                {(shuffledOptions.get(currentQuestion._id) || currentQuestion.options).map((option, index) => {
                   const isMultiSelect = currentQuestion.correct.length > 1;
                   return (
                     <Card

@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getAnalytics, isSupported  } from "firebase/analytics";
 import {
   getAuth,
   GoogleAuthProvider
@@ -22,7 +23,20 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
-export { auth, googleProvider };
+let analytics;
+if (typeof window !== "undefined") {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+      console.log("Firebase Analytics initialized");
+    } else {
+      console.warn("Analytics not supported in this environment");
+    }
+  });
+}
+
+export { auth, googleProvider, analytics  };

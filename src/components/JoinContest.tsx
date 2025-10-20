@@ -3,11 +3,14 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Badge } from '@radix-ui/themes';
 import { EnterIcon, StarFilledIcon, RocketIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+import { createUserContestAnalytics, createDailyUserAnalytics, createContestAnalytics } from '../services/analyticsService';
 import '../App.css';
 
 interface ContestMeta {
   code: string;
   mode: string;
+  contestType: 'normal' | 'nptel';
   isLive: boolean;
   duration: number;
   startTime: string;
@@ -18,6 +21,7 @@ interface ContestMeta {
 
 export default function JoinContest() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [searchParams] = useSearchParams();
   const [contestCode, setContestCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -50,6 +54,31 @@ export default function JoinContest() {
         //   setError('This contest has already started. You cannot join now.');
         //   return;
         // }
+
+        if (user?._id && contestMeta.contestType && contestMeta.mode) {
+          const timestamp = Date.now();
+          try {
+            await createUserContestAnalytics(
+              user._id,
+              contestMeta.contestType,
+              contestMeta.mode as 'duel' | 'practice' | 'multiplayer'
+            );
+
+            await createDailyUserAnalytics(
+              user._id,
+              timestamp,
+              contestMeta.contestType,
+              contestMeta.mode as 'duel' | 'practice' | 'multiplayer'
+            );
+
+            await createContestAnalytics(
+              contestMeta.id,
+              timestamp
+            );
+          } catch (analyticsError) {
+            console.error('Analytics tracking failed:', analyticsError);
+          }
+        }
 
         // Navigate to waiting room with contest ID
         navigate(`/contest/${contestMeta.id}/waiting`, { 

@@ -3,6 +3,8 @@ import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge,
 import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+import { createUserNptelAnalytics, createDailyUserAnalytics, createNptelPracticeAnalytics } from '../services/analyticsService';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
 
@@ -48,6 +50,7 @@ interface TestResult {
 
 export default function Practice() {
   // const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
@@ -188,6 +191,19 @@ export default function Practice() {
         return;
       }
 
+      if (user?._id) {
+        const timestamp = Date.now();
+        try {
+          await createUserNptelAnalytics(user._id, 1, 0);
+
+          await createDailyUserAnalytics(user._id, timestamp, undefined, undefined, 1, 0);
+
+          await createNptelPracticeAnalytics(selectedCourse.code, timestamp);
+        } catch (analyticsError) {
+          console.error('Analytics tracking failed:', analyticsError);
+        }
+      }
+
       // Shuffle questions
       let shuffled = [...response.data.questions].sort(() => Math.random() - 0.5);
       
@@ -261,7 +277,7 @@ export default function Practice() {
     }
   };
 
-  const handleTestEnd = () => {
+  const handleTestEnd = async () => {
     // Save timing for last question
     const currentQuestion = questions[currentQuestionIndex];
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
@@ -309,6 +325,17 @@ export default function Practice() {
     const existingResults = JSON.parse(localStorage.getItem('practiceTestResults') || '[]');
     existingResults.push(result);
     localStorage.setItem('practiceTestResults', JSON.stringify(existingResults));
+
+    if (user?._id && selectedCourse) {
+      const timestamp = Date.now();
+      try {
+        await createUserNptelAnalytics(user._id, 0, 1);
+
+        await createDailyUserAnalytics(user._id, timestamp, undefined, undefined, 0, 1);
+      } catch (analyticsError) {
+        console.error('Analytics tracking failed:', analyticsError);
+      }
+    }
 
     setTestResult(result);
     setTestActive(false);

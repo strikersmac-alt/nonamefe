@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog } from '@radix-ui/themes';
 import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
+import { createUserContestAnalytics, createDailyUserAnalytics, createContestAnalytics } from '../services/analyticsService';
 import '../App.css';
 
 interface FormData {
@@ -33,6 +35,7 @@ interface ApiResponse {
 interface ContestMeta {
   code: string;
   mode: string;
+  contestType: 'normal' | 'nptel';
   isLive: boolean;
   duration: number;
   startTime: string;
@@ -43,6 +46,7 @@ interface ContestMeta {
 
 export default function CreateContest() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
   const [formData, setFormData] = useState<FormData>({
     topic: '',
     difficulty: 'medium',
@@ -210,6 +214,27 @@ export default function CreateContest() {
       }
 
       if (result.data.success && result.data.code) {
+        if (user?._id) {
+          const timestamp = Date.now();
+          try {
+            
+            await createUserContestAnalytics(
+              user._id,
+              formData.contestType,
+              formData.mode as 'duel' | 'practice' | 'multiplayer'
+            );
+
+            await createDailyUserAnalytics(
+              user._id,
+              timestamp,
+              formData.contestType,
+              formData.mode as 'duel' | 'practice' | 'multiplayer'
+            );
+          } catch (analyticsError) {
+            console.error('Analytics tracking failed:', analyticsError);
+          }
+        }
+
         // Automatically join the contest by fetching its metadata
         try {
           const contestResponse = await axios.get<{ success: boolean; meta: ContestMeta }>(
@@ -217,6 +242,19 @@ export default function CreateContest() {
           );
 
           if (contestResponse.data.success && contestResponse.data.meta) {
+            // Track contest analytics
+            if (contestResponse.data.meta.id) {
+              try {
+                await createContestAnalytics(
+                  contestResponse.data.meta.id,
+                  Date.now(),
+                  formData.contestType === 'normal' ? formData.topic : selectedCourse?.name || 'ai'
+                );
+              } catch (analyticsError) {
+                console.error('Contest analytics tracking failed:', analyticsError);
+              }
+            }
+
             // Navigate directly to waiting room
             navigate(`/contest/${contestResponse.data.meta.id}/waiting`, {
               state: { contestMeta: contestResponse.data.meta }

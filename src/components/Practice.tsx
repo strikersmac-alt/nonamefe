@@ -388,46 +388,41 @@ export default function Practice() {
               background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%)',
               backdropFilter: 'blur(20px)',
               border: '1.5px solid rgba(99, 102, 241, 0.4)',
-              padding: '2rem',
+              padding: '0.75rem',
             }}>
-              <Flex direction="column" gap="3">
-                <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+              <Flex direction="column" gap="1">
+                <Text size="4" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                   {testResult.courseName}
                 </Text>
                 <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.8)' }}>
                   Weeks: {testResult.weeks.join(', ')}
                 </Text>
-                <Flex gap="6" style={{ marginTop: '1rem' }} wrap="wrap">
+                <Flex gap="4" style={{ marginTop: '1rem' }} wrap="wrap">
                   <Box>
-                    <Text size="7" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                    <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                       {testResult.score}%
                     </Text>
-                    <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>Score</Text>
+                    <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}> Score</Text>
                   </Box>
+                  
                   <Box>
-                    <Text size="7" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
-                      {testResult.correctAnswers}/{testResult.totalQuestions}
-                    </Text>
-                    <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>Correct</Text>
-                  </Box>
-                  <Box>
-                    <Text size="7" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                    <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                       {formatTime(testResult.totalTimeTaken)}
                     </Text>
-                    <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>Time Taken</Text>
+                    <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}> Time Taken</Text>
                   </Box>
                 </Flex>
               </Flex>
             </Card>
 
-            <Grid columns={{ initial: '1', sm: '3' }} gap="3">
+            <Grid columns={{ initial: '3', sm: '3' }} gap="3">
               <Card className="feature-card" style={{
                 background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
                 border: '1px solid rgba(34, 197, 94, 0.3)',
                 backdropFilter: 'blur(10px)',
-                padding: '1.5rem',
+                padding: '0.5rem',
               }}>
-                <Flex direction="column" align="center" gap="2">
+                <Flex direction="column" align="center" gap="1">
                   <CheckCircledIcon width={32} height={32} color="rgb(34, 197, 94)" />
                   <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                     {testResult.correctAnswers}
@@ -439,9 +434,9 @@ export default function Practice() {
                 background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
                 border: '1px solid rgba(239, 68, 68, 0.3)',
                 backdropFilter: 'blur(10px)',
-                padding: '1.5rem',
+                padding: '0.5rem',
               }}>
-                <Flex direction="column" align="center" gap="2">
+                <Flex direction="column" align="center" gap="1">
                   <CrossCircledIcon width={32} height={32} color="rgb(239, 68, 68)" />
                   <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                     {testResult.wrongAnswers}
@@ -453,9 +448,9 @@ export default function Practice() {
                 background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
                 border: '1px solid rgba(251, 146, 60, 0.3)',
                 backdropFilter: 'blur(10px)',
-                padding: '1.5rem',
+                padding: '0.5rem',
               }}>
-                <Flex direction="column" align="center" gap="2">
+                <Flex direction="column" align="center" gap="1">
                   <ClockIcon width={32} height={32} color="rgb(251, 146, 60)" />
                   <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                     {testResult.unanswered}
@@ -926,14 +921,14 @@ export default function Practice() {
                         background: selectedWeeks.includes(week) 
                           ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
                           : 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
-                        border: selectedWeeks.includes(week) ? '2px solid rgba(99, 102, 241, 0.6)' : '1px solid rgba(99, 102, 241, 0.2)',
+                        border: selectedWeeks.includes(week) ? '1px solid rgba(99, 102, 241, 0.6)' : '1px solid rgba(99, 102, 241, 0.2)',
                         textAlign: 'center',
-                        padding: '0.75rem',
+                        padding: '0.4rem',
                         transition: 'all 0.2s ease',
                       }}
                       onClick={() => handleWeekToggle(week)}
                     >
-                      <Text weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Week {week}</Text>
+                      <Text size="1" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Week {week}</Text>
                     </Card>
                   ))}
                 </Grid>

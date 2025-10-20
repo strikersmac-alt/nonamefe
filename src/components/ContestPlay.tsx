@@ -40,7 +40,7 @@ export default function ContestPlay() {
   const navigate = useNavigate();
   const { contestId } = useParams<{ contestId: string }>();
   const location = useLocation();
-  const contestMeta = location.state?.contestMeta as ContestMeta;
+  const initialContestMeta = location.state?.contestMeta as ContestMeta;
 
   const [socket, setSocket] = useState<Socket | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -54,6 +54,7 @@ export default function ContestPlay() {
   const [score, setScore] = useState(0);
   const [currentAnswerResult, setCurrentAnswerResult] = useState<AnswerResult | null>(null);
   const [showEndTestModal, setShowEndTestModal] = useState(false);
+  const [contestMeta, setContestMeta] = useState<ContestMeta | null>(initialContestMeta || null);
 
   useEffect(() => {
     if (currentAnswerResult) {
@@ -124,26 +125,76 @@ export default function ContestPlay() {
     };
   }, []);
 
-  // Fetch questions
+  // Fetch questions + progress
   useEffect(() => {
-    const fetchQuestions = async () => {
+    const fetchQuestionsAndProgress = async () => {
       try {
-        const response = await axios.get<{ success: boolean; questions: Question[] }>(
+        const questionsResponse = await axios.get<{ success: boolean; questions: Question[]; meta: ContestMeta }>(
           `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/questions`
         );
         
-        if (response.data.success) {
-          setQuestions(response.data.questions);
+        if (questionsResponse.data.success) {
+          setQuestions(questionsResponse.data.questions);
+          if (questionsResponse.data.meta) {
+            setContestMeta(questionsResponse.data.meta);
+          }
+          
+          try {
+            const summaryResponse = await axios.get(
+              `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/summary`,
+              { withCredentials: true }
+            );
+            
+            if (summaryResponse.data.success) {
+              const userAnswers = summaryResponse.data.userAnswers || [];
+              
+              if (userAnswers.length > 0) {
+                const restoredAnswers: AnswerResult[] = userAnswers.map((ua: any) => ({
+                  questionId: ua.questionId,
+                  isCorrect: ua.isCorrect,
+                  selectedAnswer: ua.answer
+                }));
+                
+                setAnswers(restoredAnswers);
+                
+                const previousScore = userAnswers.filter((ua: any) => ua.isCorrect).length;
+                setScore(previousScore);
+                
+                const answeredQuestionIds = new Set(userAnswers.map((ua: any) => ua.questionId));
+                const firstUnansweredIndex = questionsResponse.data.questions.findIndex(
+                  (q: Question) => !answeredQuestionIds.has(String(q._id))
+                );
+                
+                if (firstUnansweredIndex !== -1) {
+                  setCurrentQuestionIndex(firstUnansweredIndex);
+                  console.log(`Resuming from question ${firstUnansweredIndex + 1} with score ${previousScore}`);
+                } else {
+                  const completedContests = JSON.parse(localStorage.getItem('completedContests') || '[]');
+                  if (!completedContests.includes(contestId)) {
+                    completedContests.push(contestId);
+                    localStorage.setItem('completedContests', JSON.stringify(completedContests));
+                  }
+                  navigate(`/contest/${contestId}/standings`, { 
+                    state: { contestMeta, finalScore: previousScore },
+                    replace: true
+                  });
+                  return;
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error fetching previous progress:', error);
+          }
         }
       } catch (error) {
-        // Silently handle error
+        console.error('Error fetching questions:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchQuestions();
-  }, [contestId]);
+    fetchQuestionsAndProgress();
+  }, [contestId, navigate]);
 
   // Initialize socket and timer
   useEffect(() => {

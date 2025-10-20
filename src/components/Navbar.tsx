@@ -273,8 +273,8 @@ export default function Navbar() {
             </DropdownMenu.Root>
           </Flex>
         ) : (
-          <Flex align="center" gap="3">
-            <Button
+          <Flex align="end" gap="3">
+            {/* <Button
               variant="ghost"
               size="2"
               onClick={() => navigate('/')}
@@ -286,8 +286,8 @@ export default function Navbar() {
             >
               <HomeIcon />
               Home
-            </Button>
-            <Box style={{ minWidth: '140px' }}>
+            </Button> */}
+            <Box style={{ minWidth: '110px' }}>
               <GoogleSignInButton />
             </Box>
           </Flex>

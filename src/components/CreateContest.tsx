@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog, Checkbox } from '@radix-ui/themes';
+import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog } from '@radix-ui/themes';
 import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import '../App.css';
@@ -748,20 +748,20 @@ export default function CreateContest() {
                       ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
                       : 'rgba(15, 23, 42, 0.5)',
                     border: formData.weeks.includes(week)
-                      ? '2px solid rgba(99, 102, 241, 0.6)'
+                      ? '1px solid rgba(99, 102, 241, 0.6)'
                       : '1px solid rgba(99, 102, 241, 0.2)',
-                    padding: '0.5rem',
+                    padding: '0.4rem',
                     cursor: 'pointer',
                     textAlign: 'center',
                     transition: 'all 0.2s ease',
-                    minWidth: 0,
+                    // minWidth: 0,
                   }}
                 >
                   <Flex align="center" justify="center" gap="1" style={{ minWidth: 0 }}>
-                    <Checkbox checked={formData.weeks.includes(week)} style={{ flexShrink: 0 }} />
+                    {/* <Checkbox checked={formData.weeks.includes(week)} style={{ flexShrink: 0 }} /> */}
                     <Text size="1" weight="medium" style={{ 
                       color: 'rgba(226, 232, 240, 0.95)',
-                      whiteSpace: 'nowrap',
+                      // whiteSpace: 'nowrap',
                       fontSize: 'clamp(0.7rem, 1.5vw, 0.875rem)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',

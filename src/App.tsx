@@ -10,6 +10,7 @@ import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import Practice from './components/Practice';
 import PrivateRoute from './components/PrivateRoute';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 import { ToastContainer } from 'react-toastify';
 
@@ -38,6 +39,7 @@ export default function App() {
 					<Route path="/practice" element={<Practice />} />
 					<Route path="/create-contest" element={<CreateContest />} />
 					<Route path="/join-contest" element={<JoinContest />} />
+					<Route path="/analytics" element={<AnalyticsDashboard />} />
 					<Route path="/contest/:contestId/waiting" element={<WaitingRoom />} />
 					<Route path="/contest/:contestId/play" element={<ContestPlay />} />
 					<Route path="/contest/:contestId/standings" element={<Standings />} />

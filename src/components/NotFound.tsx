@@ -202,7 +202,7 @@ export default function NotFound() {
               marginTop: '1rem',
             }}
           >
-            "Not all who wander are lost... but this page sure is!" 🚀
+            "Not all who wander are lost... but this page sure is!" 
           </Text>
         </Flex>
       </Container>

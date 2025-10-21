@@ -10,9 +10,9 @@ import Profile from './components/Profile';
 import Navbar from './components/Navbar';
 import Practice from './components/Practice';
 import PrivateRoute from './components/PrivateRoute';
+import NotFound from './components/NotFound';
 
 import { ToastContainer } from 'react-toastify';
-
 
 export default function App() {
 	return (
@@ -50,6 +50,7 @@ export default function App() {
 				<Route path="/contest/:contestId/play" element={<ContestPlay />} />
 				<Route path="/contest/:contestId/standings" element={<Standings />} />
 				<Route path="/contest/:contestId/summary" element={<ContestSummary />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</Router>
 	);

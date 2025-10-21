@@ -392,13 +392,16 @@
   }
 }
 
-/* Blinking cursor animation */
+/* Blinking cursor animation - smoother */
 @keyframes blink {
-  0%, 49% {
+  0%, 45% {
     opacity: 1;
   }
-  50%, 100% {
+  50%, 95% {
     opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }
 
@@ -535,6 +538,35 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* ========================
+   GLOBAL THIN SCROLLBAR
+   ======================== */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.4) transparent;
 }
 
 /* ========================

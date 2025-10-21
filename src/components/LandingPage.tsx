@@ -3,14 +3,23 @@ import { LightningBoltIcon, GlobeIcon, RocketIcon, MixIcon, ChatBubbleIcon, Laye
 import '../App.css';
 import { useEffect, useState } from 'react';
 
-// Typing animation hook
-const useTypingEffect = (words: string[], typingSpeed = 150, deletingSpeed = 100, pauseDuration = 2000) => {
+// Typing animation hook with smoother effect
+const useTypingEffect = (words: string[], typingSpeed = 80, deletingSpeed = 50, pauseDuration = 2000) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const word = words[currentWordIndex];
+
+    if (isPaused) {
+      const pauseTimeout = setTimeout(() => {
+        setIsPaused(false);
+        setIsDeleting(true);
+      }, pauseDuration);
+      return () => clearTimeout(pauseTimeout);
+    }
 
     const timeout = setTimeout(() => {
       if (!isDeleting) {
@@ -19,7 +28,7 @@ const useTypingEffect = (words: string[], typingSpeed = 150, deletingSpeed = 100
           setCurrentText(word.slice(0, currentText.length + 1));
         } else {
           // Pause before deleting
-          setTimeout(() => setIsDeleting(true), pauseDuration);
+          setIsPaused(true);
         }
       } else {
         // Deleting
@@ -33,7 +42,7 @@ const useTypingEffect = (words: string[], typingSpeed = 150, deletingSpeed = 100
     }, isDeleting ? deletingSpeed : typingSpeed);
 
     return () => clearTimeout(timeout);
-  }, [currentText, isDeleting, currentWordIndex, words, typingSpeed, deletingSpeed, pauseDuration]);
+  }, [currentText, isDeleting, isPaused, currentWordIndex, words, typingSpeed, deletingSpeed, pauseDuration]);
 
   return currentText;
 };
@@ -242,7 +251,7 @@ export default function LandingPage() {
                 {typingText}
                 <span style={{
                   borderRight: '2px solid #f472b6',
-                  animation: 'blink 1s infinite',
+                  animation: 'blink 0.8s ease-in-out infinite',
                   marginLeft: '2px',
                 }}></span>
               </span>

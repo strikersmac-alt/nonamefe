@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField } from '@radix-ui/themes';
-import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
+import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField, Switch } from '@radix-ui/themes';
+import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon, ShuffleIcon } from '@radix-ui/react-icons';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
@@ -59,6 +59,7 @@ export default function Practice() {
   const [showModal, setShowModal] = useState(false);
   const [questionLimit, setQuestionLimit] = useState<number>(0);
   const [availableQuestions, setAvailableQuestions] = useState<number>(0);
+  const [shuffleEnabled, setShuffleEnabled] = useState(true);
   
   // Test state
   const [testActive, setTestActive] = useState(false);
@@ -205,22 +206,24 @@ export default function Practice() {
         }
       }
 
-      // Shuffle questions
-      let shuffled = [...response.data.questions].sort(() => Math.random() - 0.5);
+      // Always shuffle questions
+      let processedQuestions = [...response.data.questions].sort(() => Math.random() - 0.5);
       
       // Apply question limit if set (0 means all questions)
-      if (questionLimit > 0 && questionLimit < shuffled.length) {
-        shuffled = shuffled.slice(0, questionLimit);
+      if (questionLimit > 0 && questionLimit < processedQuestions.length) {
+        processedQuestions = processedQuestions.slice(0, questionLimit);
       }
       
-      // Shuffle options for each question
+      // Shuffle options for each question if enabled
       const optionsMap = new Map<string, string[]>();
-      shuffled.forEach(question => {
-        const shuffledOpts = [...question.options].sort(() => Math.random() - 0.5);
+      processedQuestions.forEach(question => {
+        const shuffledOpts = shuffleEnabled
+          ? [...question.options].sort(() => Math.random() - 0.5)
+          : [...question.options];
         optionsMap.set(question._id, shuffledOpts);
       });
       
-      setQuestions(shuffled);
+      setQuestions(processedQuestions);
       setShuffledOptions(optionsMap);
       setTestActive(true);
       setShowModal(false);
@@ -1057,6 +1060,46 @@ export default function Practice() {
                       {mins}m
                     </Button>
                   ))}
+                </Flex>
+              </Box>
+
+              <Box>
+                <Flex align="center" justify="between" style={{
+                  padding: '1rem',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  borderRadius: '0.75rem',
+                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                }}>
+                  <Flex align="center" gap="3">
+                    <Box style={{
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: shuffleEnabled ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(99, 102, 241, 0.2)',
+                      borderRadius: '0.5rem',
+                      transition: 'all 0.3s ease',
+                    }}>
+                      <ShuffleIcon width={18} height={18} style={{ color: 'white' }} />
+                    </Box>
+                    <Flex direction="column" gap="1">
+                      <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                        Shuffle Answer Options
+                      </Text>
+                      <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
+                        Randomize the order of answer options
+                      </Text>
+                    </Flex>
+                  </Flex>
+                  <Switch
+                    checked={shuffleEnabled}
+                    onCheckedChange={setShuffleEnabled}
+                    size="2"
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  />
                 </Flex>
               </Box>
 

@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { createUserContestAnalytics, createDailyUserAnalytics, createContestAnalytics } from '../services/analyticsService';
 import '../App.css';
-
+import useDocumentTitle from '../hooks/useDocumentTitle';
 interface ContestMeta {
   code: string;
   mode: string;
@@ -26,7 +26,7 @@ export default function JoinContest() {
   const [contestCode, setContestCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  useDocumentTitle("MindMuse - Join Contest");
   // Auto-fill contest code from URL parameter
   useEffect(() => {
     const codeFromUrl = searchParams.get('code');

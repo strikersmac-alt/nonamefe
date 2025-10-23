@@ -7,6 +7,7 @@ import { useAuthStore } from '../store/authStore';
 import { createUserNptelAnalytics, createDailyUserAnalytics, createNptelPracticeAnalytics } from '../services/analyticsService';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 interface Course {
   _id: string;
@@ -74,7 +75,7 @@ export default function Practice() {
   // Analysis state
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
-
+  useDocumentTitle("MindMuse - Practice");
   useEffect(() => {
     fetchCourses();
   }, []);

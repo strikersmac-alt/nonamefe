@@ -6,7 +6,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { createUserContestAnalytics, createDailyUserAnalytics, createContestAnalytics } from '../services/analyticsService';
 import '../App.css';
-
+import useDocumentTitle from '../hooks/useDocumentTitle';
 interface FormData {
   topic: string;
   difficulty: string;
@@ -69,7 +69,7 @@ export default function CreateContest() {
   const [coursesLoading, setCoursesLoading] = useState(false);
   const [courseSearch, setCourseSearch] = useState('');
   const [showCourseDropdown, setShowCourseDropdown] = useState(false);
-
+  useDocumentTitle("MindMuse - Create Contest");
   useEffect(() => {
     if (formData.contestType === 'nptel') {
       fetchCourses();

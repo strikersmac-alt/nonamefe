@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Text, Card, Grid, Container } from '@radix-ui/theme
 import { LightningBoltIcon, GlobeIcon, RocketIcon, MixIcon, ChatBubbleIcon, LayersIcon, ReaderIcon, MagicWandIcon } from '@radix-ui/react-icons';
 import '../App.css';
 import { useEffect, useState } from 'react';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 // Typing animation hook with smoother effect
 const useTypingEffect = (words: string[], typingSpeed = 80, deletingSpeed = 50, pauseDuration = 2000) => {
@@ -9,6 +10,8 @@ const useTypingEffect = (words: string[], typingSpeed = 80, deletingSpeed = 50, 
   const [currentText, setCurrentText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+
+  useDocumentTitle("MindMuse - Home")
 
   useEffect(() => {
     const word = words[currentWordIndex];

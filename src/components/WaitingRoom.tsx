@@ -6,7 +6,7 @@ import { io, Socket } from 'socket.io-client';
 import axios from 'axios';
 import '../App.css';
 import { useAuthStore } from '../store/authStore';
-
+import useDocumentTitle from '../hooks/useDocumentTitle';
 interface Participant {
   userId: string;
   name: string;
@@ -39,7 +39,7 @@ export default function WaitingRoom() {
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const user = useAuthStore((state) => state.user);
-
+  useDocumentTitle("MindMuse - Waiting Room");
   useEffect(() => {
     // Check if contest is already completed
     const completedContests = JSON.parse(localStorage.getItem('completedContests') || '[]');

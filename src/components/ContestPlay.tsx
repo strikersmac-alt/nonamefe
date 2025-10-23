@@ -8,6 +8,7 @@ import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 
 interface Question {
@@ -55,6 +56,8 @@ export default function ContestPlay() {
   const [currentAnswerResult, setCurrentAnswerResult] = useState<AnswerResult | null>(null);
   const [showEndTestModal, setShowEndTestModal] = useState(false);
   const [contestMeta, setContestMeta] = useState<ContestMeta | null>(initialContestMeta || null);
+
+  useDocumentTitle("MindMuse - Contest");
 
   useEffect(() => {
     if (currentAnswerResult) {

@@ -21,6 +21,7 @@ import {
 } from '@radix-ui/react-icons';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 interface ContestHistory {
   contestId: string;
@@ -77,7 +78,7 @@ export default function Profile() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalContests, setTotalContests] = useState(0);
   const contestsPerPage = 10;
-
+  useDocumentTitle("MindMuse - Profile");
   useEffect(() => {
     if (!user) {
       navigate('/');

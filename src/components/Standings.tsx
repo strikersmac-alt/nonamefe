@@ -7,7 +7,7 @@ import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import { useAuthStore } from '../store/authStore';
 import '../App.css';
-
+import useDocumentTitle from '../hooks/useDocumentTitle';
 interface Standing {
   userId: string;
   name: string;
@@ -38,7 +38,7 @@ export default function Standings() {
   const [contestInfo, setContestInfo] = useState<{ isLive: boolean; totalParticipants: number; capacity: number } | null>(null);
   const user = useAuthStore((state) => state.user);
   const currentUserId = user?._id || '';
-
+  useDocumentTitle("MindMuse - Standings");
   useEffect(() => {
     if (finalScore !== undefined && !fromProfile) {
       window.history.pushState(null, '', window.location.href);

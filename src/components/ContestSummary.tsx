@@ -5,6 +5,7 @@ import { HomeIcon, CheckCircledIcon, CrossCircledIcon, ClockIcon, StarIcon } fro
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
+import useDocumentTitle from '../hooks/useDocumentTitle';
 
 interface Question {
   _id: string;
@@ -47,6 +48,7 @@ export default function ContestSummary() {
   const [wrongAnswers, setWrongAnswers] = useState(0);
   const [unanswered, setUnanswered] = useState(0);
 
+  useDocumentTitle("MindMuse - Contest Summary");
   useEffect(() => {
     fetchContestSummary();
   }, [contestId]);

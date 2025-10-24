@@ -742,7 +742,7 @@ export default function Practice() {
               display: 'flex',
               justifyContent: 'flex-start',
             }}>
-              <Flex gap="2" style={{ flexWrap: 'nowrap', minWidth: 'max-content' }}>
+              <Flex gap="2" style={{ flexWrap: 'nowrap', minWidth: 'max-content', margin:"auto" }}>
                 {questions.map((_, index) => (
                   <Box
                     key={index}

@@ -32,6 +32,15 @@ export default function Navbar() {
     }
   };
 
+  const handleNav = (to: string) => {
+    const currentPath = window.location.pathname;
+    if (to === currentPath) {
+      window.location.reload();
+    } else {
+      navigate(to);
+    }
+  };
+
   return (
     <Box
       className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}
@@ -69,7 +78,7 @@ export default function Navbar() {
           align="center"
           gap="2"
           style={{ cursor: 'pointer' }}
-          onClick={() => navigate('/')}
+          onClick={() => handleNav('/')}
         >
           <Box
             style={{
@@ -126,7 +135,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="2"
-                onClick={() => navigate('/')}
+                onClick={() => handleNav('/')}
                 style={{
                   cursor: 'pointer',
                   color: 'rgba(226, 232, 240, 0.9)',
@@ -139,7 +148,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="2"
-                onClick={() => navigate('/create-contest')}
+                onClick={() => handleNav('/create-contest')}
                 style={{
                   cursor: 'pointer',
                   color: 'rgba(226, 232, 240, 0.9)',
@@ -152,7 +161,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="2"
-                onClick={() => navigate('/join-contest')}
+                onClick={() => handleNav('/join-contest')}
                 style={{
                   cursor: 'pointer',
                   color: 'rgba(226, 232, 240, 0.9)',
@@ -165,7 +174,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="2"
-                onClick={() => navigate('/practice')}
+                onClick={() => handleNav('/practice')}
                 style={{
                   cursor: 'pointer',
                   color: 'rgba(226, 232, 240, 0.9)',
@@ -222,7 +231,7 @@ export default function Navbar() {
                 {/* Mobile Menu Items */}
                 <Box className="mobile-menu-items">
                   <DropdownMenu.Item
-                    onClick={() => navigate('/')}
+                    onClick={() => handleNav('/')}
                     style={{
                       cursor: 'pointer',
                       color: 'rgba(226, 232, 240, 0.9)',
@@ -231,7 +240,7 @@ export default function Navbar() {
                     <HomeIcon /> Home
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
-                    onClick={() => navigate('/create-contest')}
+                    onClick={() => handleNav('/create-contest')}
                     style={{
                       cursor: 'pointer',
                       color: 'rgba(226, 232, 240, 0.9)',
@@ -240,7 +249,7 @@ export default function Navbar() {
                     <PlusIcon /> Create Contest
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
-                    onClick={() => navigate('/join-contest')}
+                    onClick={() => handleNav('/join-contest')}
                     style={{
                       cursor: 'pointer',
                       color: 'rgba(226, 232, 240, 0.9)',
@@ -249,7 +258,7 @@ export default function Navbar() {
                     <RocketIcon /> Join Contest
                   </DropdownMenu.Item>
                   <DropdownMenu.Item
-                    onClick={() => navigate('/practice')}
+                    onClick={() => handleNav('/practice')}
                     style={{
                       cursor: 'pointer',
                       color: 'rgba(226, 232, 240, 0.9)',

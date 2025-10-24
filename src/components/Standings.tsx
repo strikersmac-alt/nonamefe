@@ -111,7 +111,7 @@ export default function Standings() {
           socketInstance.on('connect', () => {
             // console.log('Connected to socket, joining contest:', contestId);
             socketInstance.emit('joinContest', contestId, async (response: any) => {
-              // console.log('Join contest response:', response);
+              console.log('Join contest response:', response);
               
               // Request initial standings after joining
               socketInstance.emit('getStandings', contestId, async (standingsResponse: any) => {

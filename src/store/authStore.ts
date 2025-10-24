@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
 );
 
 export const validateUser = async () => {
-  const baseURL = import.meta.env.VITE_API_URL;
+  // const baseURL = import.meta.env.VITE_API_URL;
   // console.log(baseURL)
 ;  try {
     const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/verify`, {

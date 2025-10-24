@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField, Switch } from '@radix-ui/themes';
 import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon, ShuffleIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
-// import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { createUserNptelAnalytics, createDailyUserAnalytics, createNptelPracticeAnalytics } from '../services/analyticsService';
@@ -50,7 +51,7 @@ interface TestResult {
 }
 
 export default function Practice() {
-  // const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuthStore();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,7 @@ export default function Practice() {
   const [availableQuestions, setAvailableQuestions] = useState<number>(0);
   const [shuffleEnabled, setShuffleEnabled] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [autoNextEnabled, setAutoNextEnabled] = useState(true);
 
   // Test state
   const [testActive, setTestActive] = useState(false);
@@ -72,11 +74,21 @@ export default function Practice() {
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [questionTimings, setQuestionTimings] = useState<Map<string, number>>(new Map());
   const [shuffledOptions, setShuffledOptions] = useState<Map<string, string[]>>(new Map());
-
+  const navigate = useNavigate();
   // Analysis state
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   useDocumentTitle("MindMuse - Practice");
+  
+  useEffect(() => {
+    if (location.pathname === '/practice' && showAnalysis) {
+      setShowAnalysis(false);
+      setTestResult(null);
+      setTestActive(false);
+      navigate('/practice');
+    }
+  }, [location.pathname]);
+
   useEffect(() => {
     fetchCourses();
   }, []);
@@ -261,6 +273,10 @@ export default function Practice() {
     const newAnswersMap = new Map(answers);
     newAnswersMap.set(currentQuestion._id, newAnswers);
     setAnswers(newAnswersMap);
+
+    if (autoNextEnabled && !isMultiSelect) {
+      handleNextQuestion();
+    }
   };
 
   const handleNextQuestion = () => {
@@ -619,13 +635,37 @@ export default function Practice() {
               </Button>
             </Flex>
 
-            <Progress
-              value={progress}
-              style={{
-                height: '8px',
-                background: 'rgba(15, 23, 42, 0.5)',
-              }}
-            />
+            <Flex direction="column" gap="2">
+              <Progress
+                value={progress}
+                style={{
+                  height: '8px',
+                  background: 'rgba(15, 23, 42, 0.5)',
+                }}
+              />
+              
+              {/* Auto-Next Toggle */}
+              <Flex justify="end" align="center">
+                <Flex align="center" gap="2" style={{
+                  padding: '0.5rem 0.75rem',
+                  background: 'rgba(99, 102, 241, 0.1)',
+                  borderRadius: '0.5rem',
+                  border: '1px solid rgba(99, 102, 241, 0.2)',
+                }}>
+                  <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
+                    Auto Next
+                  </Text>
+                  <Switch
+                    checked={autoNextEnabled}
+                    onCheckedChange={setAutoNextEnabled}
+                    size="1"
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  />
+                </Flex>
+              </Flex>
+            </Flex>
           </Flex>
 
           {/* Question Card */}
@@ -676,7 +716,7 @@ export default function Practice() {
                     <Card
                       key={index}
                       className="feature-card"
-                      onClick={() => { handleAnswerSelect(option), handleNextQuestion() }}
+                      onClick={() => handleAnswerSelect(option)}
                       style={{
                         background: currentAnswers.includes(option)
                           ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'

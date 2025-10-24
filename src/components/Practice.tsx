@@ -64,6 +64,8 @@ export default function Practice() {
   const [shuffleEnabled, setShuffleEnabled] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [autoNextEnabled, setAutoNextEnabled] = useState(true);
+  const [startingTest, setStartingTest] = useState(false);
+  const [endingTest, setEndingTest] = useState(false);
 
   // Test state
   const [testActive, setTestActive] = useState(false);
@@ -195,6 +197,7 @@ export default function Practice() {
 
   const handleStartTest = async () => {
     if (!selectedCourse || selectedWeeks.length === 0) return;
+    setStartingTest(true);
 
     try {
       const weeksParam = selectedWeeks.join(',');
@@ -211,9 +214,7 @@ export default function Practice() {
         const timestamp = Date.now();
         try {
           await createUserNptelAnalytics(user._id, 1, 0);
-
           await createDailyUserAnalytics(user._id, timestamp, undefined, undefined, 1, 0);
-
           await createNptelPracticeAnalytics(selectedCourse.code, timestamp);
         } catch (analyticsError) {
           console.error('Analytics tracking failed:', analyticsError);
@@ -248,6 +249,8 @@ export default function Practice() {
       setQuestionStartTime(Date.now());
     } catch (error) {
       setShowModal(false);
+    } finally {
+      setStartingTest(false);
     }
   };
 
@@ -313,6 +316,7 @@ export default function Practice() {
   };
 
   const handleTestEnd = async () => {
+    setEndingTest(true);
     // Save timing for last question
     const currentQuestion = questions[currentQuestionIndex];
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
@@ -365,7 +369,6 @@ export default function Practice() {
       const timestamp = Date.now();
       try {
         await createUserNptelAnalytics(user._id, 0, 1);
-
         await createDailyUserAnalytics(user._id, timestamp, undefined, undefined, 0, 1);
       } catch (analyticsError) {
         console.error('Analytics tracking failed:', analyticsError);
@@ -375,6 +378,7 @@ export default function Practice() {
     setTestResult(result);
     setTestActive(false);
     setShowAnalysis(true);
+    setEndingTest(false);
   };
 
   const formatTime = (seconds: number) => {
@@ -586,6 +590,14 @@ export default function Practice() {
     );
   }
 
+  if (startingTest) {
+    return <LoadingSpinner message="Preparing your test..." size="small" />;
+  }
+
+  if (endingTest) {
+    return <LoadingSpinner message="Finalizing results..." size="small" />;
+  }
+
   if (testActive && currentQuestion) {
     const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
     const timePercentage = (timeRemaining / (duration * 60)) * 100;
@@ -629,7 +641,8 @@ export default function Practice() {
                 color="red"
                 variant="soft"
                 onClick={handleTestEnd}
-                style={{ backdropFilter: 'blur(10px)' }}
+                disabled={endingTest}
+                style={{ backdropFilter: 'blur(10px)', opacity: endingTest ? 0.7 : 1 }}
               >
                 End Test
               </Button>
@@ -1218,17 +1231,18 @@ export default function Practice() {
                     </Button>
                   </Dialog.Close>
                   <Button
-                    disabled={selectedWeeks.length === 0}
+                    disabled={selectedWeeks.length === 0 || startingTest}
                     onClick={handleStartTest}
                     style={{
-                      background: selectedWeeks.length === 0
+                      background: selectedWeeks.length === 0 || startingTest
                         ? 'rgba(99, 102, 241, 0.3)'
                         : 'linear-gradient(135deg, #667eea, #764ba2)',
                       fontWeight: 600,
-                      cursor: selectedWeeks.length === 0 ? 'not-allowed' : 'pointer',
+                      cursor: selectedWeeks.length === 0 || startingTest ? 'not-allowed' : 'pointer',
+                      opacity: startingTest ? 0.7 : 1,
                     }}
                   >
-                    Start Test
+                    {startingTest ? 'Starting...' : 'Start Test'}
                   </Button>
                 </Flex>
               </Flex>

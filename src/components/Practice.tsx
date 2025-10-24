@@ -1250,6 +1250,31 @@ export default function Practice() {
           </Dialog.Root>
         </Flex>
       </Container>
+      <Box className="footer" style={{
+              width: '100%',
+              marginTop: 'auto',
+              padding: '1rem',
+              textAlign: 'center',
+              backdropFilter: 'blur(16px)',
+              background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.6))',
+              borderTop: '1px solid rgba(99, 102, 241, 0.15)',
+              position: 'relative',
+            }}>
+              <Flex direction="column" align="center" gap="1">
+                <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
+                  MindMuse
+                </Text>
+                <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)', fontSize: '0.75rem' }}>
+                  Unlock Your Curiosity
+                </Text>
+                <Text size="1" style={{
+                  color: 'rgba(148, 163, 184, 0.5)',
+                  fontSize: '0.7rem',
+                }}>
+                  &copy; {new Date().getFullYear()} MindMuse. All rights reserved.
+                </Text>
+              </Flex>
+            </Box>
     </Box>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Box, Flex, Heading, Text, Card, Grid, Container, Button, Dialog, Badge, Progress, TextField, Switch } from '@radix-ui/themes';
-import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon, ShuffleIcon } from '@radix-ui/react-icons';
+import { BookmarkIcon, ClockIcon, CheckCircledIcon, CrossCircledIcon, ResetIcon, LightningBoltIcon, ChevronLeftIcon, ChevronRightIcon, ShuffleIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
 // import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
@@ -61,7 +61,8 @@ export default function Practice() {
   const [questionLimit, setQuestionLimit] = useState<number>(0);
   const [availableQuestions, setAvailableQuestions] = useState<number>(0);
   const [shuffleEnabled, setShuffleEnabled] = useState(true);
-  
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Test state
   const [testActive, setTestActive] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -71,7 +72,7 @@ export default function Practice() {
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
   const [questionTimings, setQuestionTimings] = useState<Map<string, number>>(new Map());
   const [shuffledOptions, setShuffledOptions] = useState<Map<string, string[]>>(new Map());
-  
+
   // Analysis state
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
@@ -97,17 +98,17 @@ export default function Practice() {
   }, [testActive, timeRemaining]);
 
   useEffect(() => {
-    
-    const fetchQuestions = async() =>{
+
+    const fetchQuestions = async () => {
       try {
-          const newWeeks = selectedWeeks;
-          if(newWeeks.length === 0){
-            setAvailableQuestions(0);
-            return ;
-          }
+        const newWeeks = selectedWeeks;
+        if (newWeeks.length === 0) {
+          setAvailableQuestions(0);
+          return;
+        }
         const weeksParam = newWeeks.join(',');
         const response = await axios.get<{ questions: Question[] }>(
-          
+
           `${import.meta.env.VITE_API_URL}/api/nptel/questions/${selectedCourse?.code}?weeks=${weeksParam}`
         );
         setQuestions(response.data.questions);
@@ -143,12 +144,12 @@ export default function Practice() {
   };
 
   const handleWeekToggle = async (week: number) => {
-    const newWeeks = selectedWeeks.includes(week) 
-      ? selectedWeeks.filter(w => w !== week) 
+    const newWeeks = selectedWeeks.includes(week)
+      ? selectedWeeks.filter(w => w !== week)
       : [...selectedWeeks, week];
-    
+
     setSelectedWeeks(newWeeks);
-    
+
     // Fetch available questions count for selected weeks
     if (newWeeks.length > 0 && selectedCourse) {
       try {
@@ -170,11 +171,11 @@ export default function Practice() {
 
   const handleSelectAllWeeks = () => {
     if (!selectedCourse) return;
-    const allWeeks = Array.from({ length: selectedCourse.durationInWeeks }, (_, i) => i + 1);
+    const allWeeks = Array.from({ length: selectedCourse.durationInWeeks + 1 }, (_, i) => i);
     if (selectedWeeks.length === allWeeks.length) {
       setSelectedWeeks([]);
-      
-      
+
+
     } else {
       setSelectedWeeks(allWeeks);
     }
@@ -209,12 +210,12 @@ export default function Practice() {
 
       // Always shuffle questions
       let processedQuestions = [...response.data.questions].sort(() => Math.random() - 0.5);
-      
+
       // Apply question limit if set (0 means all questions)
       if (questionLimit > 0 && questionLimit < processedQuestions.length) {
         processedQuestions = processedQuestions.slice(0, questionLimit);
       }
-      
+
       // Shuffle options for each question if enabled
       const optionsMap = new Map<string, string[]>();
       processedQuestions.forEach(question => {
@@ -223,7 +224,7 @@ export default function Practice() {
           : [...question.options];
         optionsMap.set(question._id, shuffledOpts);
       });
-      
+
       setQuestions(processedQuestions);
       setShuffledOptions(optionsMap);
       setTestActive(true);
@@ -242,9 +243,9 @@ export default function Practice() {
     const currentQuestion = questions[currentQuestionIndex];
     const currentAnswers = answers.get(currentQuestion._id) || [];
     const isMultiSelect = currentQuestion.correct.length > 1;
-    
+
     let newAnswers: string[];
-    
+
     if (isMultiSelect) {
       // Checkbox behavior for multi-answer questions
       if (currentAnswers.includes(option)) {
@@ -256,7 +257,7 @@ export default function Practice() {
       // Radio behavior for single-answer questions
       newAnswers = [option];
     }
-    
+
     const newAnswersMap = new Map(answers);
     newAnswersMap.set(currentQuestion._id, newAnswers);
     setAnswers(newAnswersMap);
@@ -267,12 +268,17 @@ export default function Practice() {
     const currentQuestion = questions[currentQuestionIndex];
     const timeTaken = Math.floor((Date.now() - questionStartTime) / 1000);
     const newTimings = new Map(questionTimings);
-    newTimings.set(currentQuestion._id, (newTimings.get(currentQuestion._id) || 0) + timeTaken);
+    newTimings.set(
+      currentQuestion._id,
+      (newTimings.get(currentQuestion._id) || 0) + timeTaken
+    );
     setQuestionTimings(newTimings);
 
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setQuestionStartTime(Date.now());
+      setTimeout(() => {
+        setCurrentQuestionIndex((prev) => prev + 1);
+        setQuestionStartTime(Date.now());
+      }, 200);
     }
   };
 
@@ -303,7 +309,7 @@ export default function Practice() {
       const correctSorted = [...q.correct].sort();
       const selectedSorted = [...selectedOptions].sort();
       const isCorrect = JSON.stringify(correctSorted) === JSON.stringify(selectedSorted);
-      
+
       return {
         questionId: q._id,
         selectedOptions,
@@ -389,7 +395,7 @@ export default function Practice() {
                 Test Analysis
               </Heading>
               <Flex gap="2">
-                <Button 
+                <Button
                   onClick={() => {
                     setShowAnalysis(false);
                     setTestResult(null);
@@ -435,7 +441,7 @@ export default function Practice() {
                     </Text>
                     <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}> Score</Text>
                   </Box>
-                  
+
                   <Box>
                     <Text size="5" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
                       {formatTime(testResult.totalTimeTaken)}
@@ -498,7 +504,7 @@ export default function Practice() {
               {testResult.questions.map((question, index) => {
                 const answer = testResult.answers[index];
                 return (
-                  <Card key={question._id} className="feature-card" style={{ 
+                  <Card key={question._id} className="feature-card" style={{
                     background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
                     border: `1.5px solid ${answer.isCorrect ? 'rgba(34, 197, 94, 0.4)' : answer.selectedOptions.length > 0 ? 'rgba(239, 68, 68, 0.4)' : 'rgba(251, 146, 60, 0.4)'}`,
                     backdropFilter: 'blur(10px)',
@@ -522,7 +528,7 @@ export default function Practice() {
                           </Text>
                         </Flex>
                       </Flex>
-                      
+
                       <Flex direction="column" gap="2">
                         {(shuffledOptions.get(question._id) || question.options).map((option, optIndex) => {
                           const isCorrect = question.correct.includes(option);
@@ -531,11 +537,11 @@ export default function Practice() {
                             <Box key={optIndex} style={{
                               padding: '0.75rem',
                               borderRadius: '8px',
-                              background: isCorrect 
-                                ? 'rgba(34, 197, 94, 0.15)' 
-                                : isSelected 
-                                ? 'rgba(239, 68, 68, 0.15)' 
-                                : 'rgba(15, 23, 42, 0.5)',
+                              background: isCorrect
+                                ? 'rgba(34, 197, 94, 0.15)'
+                                : isSelected
+                                  ? 'rgba(239, 68, 68, 0.15)'
+                                  : 'rgba(15, 23, 42, 0.5)',
                               border: `1px solid ${isCorrect ? 'rgba(34, 197, 94, 0.4)' : isSelected ? 'rgba(239, 68, 68, 0.4)' : 'rgba(99, 102, 241, 0.2)'}`,
                             }}>
                               <Flex gap="2" align="center">
@@ -549,7 +555,7 @@ export default function Practice() {
                           );
                         })}
                       </Flex>
-                      
+
                       <Badge size="1" color="cyan" variant="soft" style={{ width: 'fit-content' }}>
                         Week {question.week}
                       </Badge>
@@ -593,9 +599,9 @@ export default function Practice() {
                 Question {currentQuestionIndex + 1} of {questions.length}
               </Badge>
 
-              <Badge 
-                size="3" 
-                color={timePercentage > 30 ? 'green' : timePercentage > 10 ? 'orange' : 'red'} 
+              <Badge
+                size="3"
+                color={timePercentage > 30 ? 'green' : timePercentage > 10 ? 'orange' : 'red'}
                 variant="soft"
                 style={{ backdropFilter: 'blur(10px)' }}
               >
@@ -603,8 +609,8 @@ export default function Practice() {
                 {formatTime(timeRemaining)}
               </Badge>
 
-              <Button 
-                color="red" 
+              <Button
+                color="red"
                 variant="soft"
                 onClick={handleTestEnd}
                 style={{ backdropFilter: 'blur(10px)' }}
@@ -613,12 +619,12 @@ export default function Practice() {
               </Button>
             </Flex>
 
-            <Progress 
-              value={progress} 
-              style={{ 
+            <Progress
+              value={progress}
+              style={{
                 height: '8px',
                 background: 'rgba(15, 23, 42, 0.5)',
-              }} 
+              }}
             />
           </Flex>
 
@@ -653,10 +659,10 @@ export default function Practice() {
               </Heading>
 
               {/* Selection Type Hint */}
-              <Badge 
-                size="1" 
-                color={currentQuestion.correct.length > 1 ? 'violet' : 'blue'} 
-                variant="soft" 
+              <Badge
+                size="1"
+                color={currentQuestion.correct.length > 1 ? 'violet' : 'blue'}
+                variant="soft"
                 style={{ width: 'fit-content' }}
               >
                 {currentQuestion.correct.length > 1 ? 'Multiple answers possible' : 'Single answer only'}
@@ -670,7 +676,7 @@ export default function Practice() {
                     <Card
                       key={index}
                       className="feature-card"
-                      onClick={() => handleAnswerSelect(option)}
+                      onClick={() => { handleAnswerSelect(option), handleNextQuestion() }}
                       style={{
                         background: currentAnswers.includes(option)
                           ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
@@ -724,9 +730,9 @@ export default function Practice() {
             >
               <ChevronLeftIcon width="18" height="18" />
             </Button>
-            
-            <Box style={{ 
-              flex: 1, 
+
+            <Box style={{
+              flex: 1,
               maxWidth: '600px',
               overflowX: 'auto',
               overflowY: 'hidden',
@@ -734,7 +740,7 @@ export default function Practice() {
               scrollbarWidth: 'thin',
               scrollbarColor: 'rgba(99, 102, 241, 0.5) transparent',
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
             }}>
               <Flex gap="2" style={{ flexWrap: 'nowrap', minWidth: 'max-content' }}>
                 {questions.map((_, index) => (
@@ -744,8 +750,8 @@ export default function Practice() {
                       width: '12px',
                       height: '12px',
                       borderRadius: '50%',
-                      background: index === currentQuestionIndex ? '#667eea' : 
-                                 answers.has(questions[index]._id) ? '#4ade80' : 'rgba(148, 163, 184, 0.3)',
+                      background: index === currentQuestionIndex ? '#667eea' :
+                        answers.has(questions[index]._id) ? '#4ade80' : 'rgba(148, 163, 184, 0.3)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       border: index === currentQuestionIndex ? '2px solid #667eea' : 'none',
@@ -766,20 +772,20 @@ export default function Practice() {
             </Box>
 
             {currentQuestionIndex === questions.length - 1 ? (
-              <Button 
+              <Button
                 onClick={handleTestEnd}
                 size="3"
                 style={{
                   background: 'linear-gradient(135deg, #667eea, #764ba2)',
                   fontWeight: 600,
-                  borderRadius : '0.7rem',
+                  borderRadius: '0.7rem',
                   minWidth: '48px',
                 }}
               >
                 <CheckCircledIcon width="18" height="18" />
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={handleNextQuestion}
                 size="3"
                 style={{
@@ -817,26 +823,56 @@ export default function Practice() {
 
       <Container size="3" px={{ initial: '4', sm: '5', md: '6' }} pt={{ initial: '4', md: '5' }} pb="6" style={{ flex: 1, position: 'relative', zIndex: 1 }}>
         <Flex direction="column" gap="5">
-          <Flex justify="between" align="center" wrap="wrap" gap="3">
+          <Flex
+            direction={{ initial: 'column', md: 'row' }}
+            justify="between"
+            align={{ initial: 'start', md: 'center' }}
+            gap="4"
+          >
             <Heading size="8" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
               NPTEL Practice
             </Heading>
-            {/* <Button 
-              variant="soft" 
-              onClick={() => navigate('/')}
-              style={{
-                background: 'rgba(99, 102, 241, 0.2)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(99, 102, 241, 0.3)',
-              }}
-            >
-              <HomeIcon /> Home
-            </Button> */}
-          </Flex>
 
-          <Text size="3" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>
-            Select a course to start practicing. Choose specific weeks and set your test duration.
-          </Text>
+            {/* Search Bar */}
+            <Box style={{
+              width: '100%',
+              maxWidth: '500px',
+              position: 'relative',
+              // border: '1.5px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '0.75rem',
+              background: 'rgba(15, 23, 42, 0.5)',
+              backdropFilter: 'blur(10px)',
+            }}>
+              <Box style={{
+                position: 'absolute',
+                left: '1rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }}>
+                <MagnifyingGlassIcon width={20} height={20} style={{ color: 'rgba(148, 163, 184, 0.8)' }} />
+              </Box>
+              <TextField.Root
+                size="3"
+                placeholder="Search courses by name ..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  paddingLeft: '2.75rem',
+                  // background: 'transparent',
+                  border: 'none',
+                  // outline: 'none',
+                  // borderRadius: '0.75rem',
+                  color: 'rgba(226, 232, 240, 0.95)',
+                  fontSize: '0.95rem',
+                  // transition: 'all 0.3s ease',
+                  boxShadow: 'none',
+                }}
+              />
+            </Box>
+          </Flex>
 
           {loading ? (
             <LoadingSpinner message="Loading courses..." size="small" />
@@ -851,290 +887,315 @@ export default function Practice() {
               <Text style={{ color: 'rgba(226, 232, 240, 0.9)' }}>No courses available. Please add courses first.</Text>
             </Card>
           ) : (
-            <Grid columns={{ initial: '1', sm: '2', md: '3' }} gap="4">
-              {courses.map(course => (
-                <Card
-                  key={course._id}
-                  className="feature-card"
-                  onClick={() => handleCourseClick(course)}
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
-                    border: '1px solid rgba(99, 102, 241, 0.2)',
-                    backdropFilter: 'blur(10px)',
-                    padding: '2rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    minHeight: '200px',
-                  }}
-                >
-                  <Flex direction="column" gap="3" style={{ height: '100%' }}>
-                    <Flex align="start" gap="3" style={{ flex: 1 }}>
-                      <Box style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '0.75rem',
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        flexShrink: 0,
-                      }}>
-                        <BookmarkIcon width={24} height={24} />
-                      </Box>
-                      <Flex direction="column" gap="1" style={{ flex: 1, minWidth: 0 }}>
-                        <Heading size="4" style={{ color: 'rgba(226, 232, 240, 0.95)', lineHeight: 1.3, wordBreak: 'break-word' }}>
-                          {course.name}
-                        </Heading>
-                        <Flex gap="1" align="center">
-                          <ClockIcon width={14} height={14} color="rgba(148, 163, 184, 0.8)" />
-                          <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
-                            {course.durationInWeeks} weeks
-                          </Text>
-                        </Flex>
-                      </Flex>
-                    </Flex>
-                    <Button 
-                      style={{ 
-                        background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                        fontWeight: 600,
-                        width: '100%',
-                      }}
-                    >
-                      Start Practice
-                    </Button>
-                  </Flex>
+            <>
+              {courses
+                .filter(course =>
+                  course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  course.code.toLowerCase().includes(searchQuery.toLowerCase())
+                ).length === 0 ? (
+                <Card className="hero-card" style={{
+                  background: 'rgba(35, 54, 85, 0.35)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1.5px solid rgba(49, 84, 130, 0.4)',
+                  padding: '2rem',
+                  textAlign: 'center',
+                }}>
+                  <Text style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
+                    No courses found matching "{searchQuery}"
+                  </Text>
                 </Card>
-              ))}
-            </Grid>
+              ) : (
+                <Grid columns={{ initial: '1', sm: '2', md: '3' }} gap="4">
+                  {courses
+                    .filter(course =>
+                      course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      course.code.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(course => (
+                      <Card
+                        key={course._id}
+                        className="feature-card"
+                        onClick={() => handleCourseClick(course)}
+                        style={{
+                          background: 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
+                          border: '1px solid rgba(99, 102, 241, 0.2)',
+                          backdropFilter: 'blur(10px)',
+                          padding: '2rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          minHeight: '200px',
+                        }}
+                      >
+                        <Flex direction="column" gap="3" style={{ height: '100%' }}>
+                          <Flex align="start" gap="3" style={{ flex: 1 }}>
+                            <Box style={{
+                              width: '48px',
+                              height: '48px',
+                              borderRadius: '0.75rem',
+                              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: 'white',
+                              flexShrink: 0,
+                            }}>
+                              <BookmarkIcon width={24} height={24} />
+                            </Box>
+                            <Flex direction="column" gap="1" style={{ flex: 1, minWidth: 0 }}>
+                              <Heading size="4" style={{ color: 'rgba(226, 232, 240, 0.95)', lineHeight: 1.3, wordBreak: 'break-word' }}>
+                                {course.name}
+                              </Heading>
+                              <Flex gap="1" align="center">
+                                <ClockIcon width={14} height={14} color="rgba(148, 163, 184, 0.8)" />
+                                <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
+                                  {course.durationInWeeks} weeks
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Flex>
+                          <Button
+                            style={{
+                              background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                              fontWeight: 600,
+                              width: '100%',
+                            }}
+                          >
+                            Start Practice
+                          </Button>
+                        </Flex>
+                      </Card>
+                    ))}
+                </Grid>
+              )}
+            </>
           )}
 
-        {/* Week Selection Modal */}
-        <Dialog.Root open={showModal} onOpenChange={setShowModal}>
-          <Dialog.Content style={{ 
-            maxWidth: 650,
-            background: 'rgba(15, 23, 42, 0.95)',
-            backdropFilter: 'blur(20px)',
-            border: '1.5px solid rgba(99, 102, 241, 0.3)',
-            borderRadius: '1rem',
-          }}>
-            <Dialog.Title style={{ color: 'rgba(226, 232, 240, 0.95)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
-              Configure Test - {selectedCourse?.name}
-            </Dialog.Title>
-            <Dialog.Description size="2" mb="4" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
-              Select the weeks you want to practice and set the test duration.
-            </Dialog.Description>
+          {/* Week Selection Modal */}
+          <Dialog.Root open={showModal} onOpenChange={setShowModal}>
+            <Dialog.Content style={{
+              maxWidth: 650,
+              background: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1.5px solid rgba(99, 102, 241, 0.3)',
+              borderRadius: '1rem',
+            }}>
+              <Dialog.Title style={{ color: 'rgba(226, 232, 240, 0.95)', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+                Configure Test - {selectedCourse?.name}
+              </Dialog.Title>
+              <Dialog.Description size="2" mb="4" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
+                Select the weeks you want to practice and set the test duration.
+              </Dialog.Description>
 
-            <Flex direction="column" gap="4">
-              <Box>
-                <Flex justify="between" align="center" mb="3">
-                  <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Select Weeks:</Text>
-                  <Button 
-                    size="1" 
-                    variant="soft"
-                    onClick={handleSelectAllWeeks}
-                    style={{
-                      background: 'rgba(99, 102, 241, 0.2)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
-                    }}
-                  >
-                    {selectedCourse && selectedWeeks.length === selectedCourse.durationInWeeks ? 'Deselect All' : 'Select All'}
-                  </Button>
-                </Flex>
-                <Grid columns="4" gap="2">
-                  {selectedCourse && Array.from({ length: selectedCourse.durationInWeeks }, (_, i) => i + 1).map(week => (
-                    <Card
-                      key={week}
-                      style={{
-                        cursor: 'pointer',
-                        background: selectedWeeks.includes(week) 
-                          ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
-                          : 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
-                        border: selectedWeeks.includes(week) ? '1px solid rgba(99, 102, 241, 0.6)' : '1px solid rgba(99, 102, 241, 0.2)',
-                        textAlign: 'center',
-                        padding: '0.4rem',
-                        transition: 'all 0.2s ease',
-                      }}
-                      onClick={() => handleWeekToggle(week)}
-                    >
-                      <Text size="1" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Week {week}</Text>
-                    </Card>
-                  ))}
-                </Grid>
-              </Box>
-
-              {availableQuestions > 0 && (
+              <Flex direction="column" gap="4">
                 <Box>
-                  <Flex justify="between" align="center" mb="2">
-                    <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
-                      Number of Questions:
-                    </Text>
-                    <Badge size="2" color="cyan" variant="soft">
-                      {availableQuestions} available
-                    </Badge>
-                  </Flex>
-                  <Flex gap="2" wrap="wrap">
+                  <Flex justify="between" align="center" mb="3">
+                    <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Select Weeks:</Text>
                     <Button
-                      size="2"
-                      variant={questionLimit === 0 ? 'solid' : 'soft'}
-                      onClick={() => setQuestionLimit(0)}
+                      size="1"
+                      variant="soft"
+                      onClick={handleSelectAllWeeks}
                       style={{
-                        background: questionLimit === 0 
-                          ? 'linear-gradient(135deg, #667eea, #764ba2)'
-                          : 'rgba(99, 102, 241, 0.2)',
-                        border: questionLimit === 0 ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
-                        fontWeight: 600,
+                        background: 'rgba(99, 102, 241, 0.2)',
+                        border: '1px solid rgba(99, 102, 241, 0.3)',
                       }}
                     >
-                      All ({availableQuestions})
+                      {selectedCourse && selectedWeeks.length === selectedCourse.durationInWeeks ? 'Deselect All' : 'Select All'}
                     </Button>
-                    {[
-                      Math.ceil(availableQuestions * 0.25),
-                      Math.ceil(availableQuestions * 0.5),
-                      Math.ceil(availableQuestions * 0.75),
-                    ].filter((num, idx, arr) => num > 0 && num < availableQuestions && arr.indexOf(num) === idx).map(num => (
-                      <Button
-                        key={num}
-                        size="2"
-                        variant={questionLimit === num ? 'solid' : 'soft'}
-                        onClick={() => setQuestionLimit(num)}
+                  </Flex>
+                  <Grid columns="4" gap="2">
+                    {selectedCourse && Array.from({ length: selectedCourse.durationInWeeks + 1}, (_, i) => i).map(week => (
+                      <Card
+                        key={week}
                         style={{
-                          background: questionLimit === num 
+                          cursor: 'pointer',
+                          background: selectedWeeks.includes(week)
+                            ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%)'
+                            : 'linear-gradient(135deg, rgba(15, 29, 49, 0.8) 0%, rgba(20, 35, 60, 0.6) 100%)',
+                          border: selectedWeeks.includes(week) ? '1px solid rgba(99, 102, 241, 0.6)' : '1px solid rgba(99, 102, 241, 0.2)',
+                          textAlign: 'center',
+                          padding: '0.4rem',
+                          transition: 'all 0.2s ease',
+                        }}
+                        onClick={() => handleWeekToggle(week)}
+                      >
+                        <Text size="1" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Week {week}</Text>
+                      </Card>
+                    ))}
+                  </Grid>
+                </Box>
+
+                {availableQuestions > 0 && (
+                  <Box>
+                    <Flex justify="between" align="center" mb="2">
+                      <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                        Number of Questions:
+                      </Text>
+                      <Badge size="2" color="cyan" variant="soft">
+                        {availableQuestions} available
+                      </Badge>
+                    </Flex>
+                    <Flex gap="2" wrap="wrap">
+                      <Button
+                        size="2"
+                        variant={questionLimit === 0 ? 'solid' : 'soft'}
+                        onClick={() => setQuestionLimit(0)}
+                        style={{
+                          background: questionLimit === 0
                             ? 'linear-gradient(135deg, #667eea, #764ba2)'
                             : 'rgba(99, 102, 241, 0.2)',
-                          border: questionLimit === num ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
+                          border: questionLimit === 0 ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
                           fontWeight: 600,
                         }}
                       >
-                        {num} ({Math.round((num / availableQuestions) * 100)}%)
+                        All ({availableQuestions})
+                      </Button>
+                      {[
+                        Math.ceil(availableQuestions * 0.25),
+                        Math.ceil(availableQuestions * 0.5),
+                        Math.ceil(availableQuestions * 0.75),
+                      ].filter((num, idx, arr) => num > 0 && num < availableQuestions && arr.indexOf(num) === idx).map(num => (
+                        <Button
+                          key={num}
+                          size="2"
+                          variant={questionLimit === num ? 'solid' : 'soft'}
+                          onClick={() => setQuestionLimit(num)}
+                          style={{
+                            background: questionLimit === num
+                              ? 'linear-gradient(135deg, #667eea, #764ba2)'
+                              : 'rgba(99, 102, 241, 0.2)',
+                            border: questionLimit === num ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {num} ({Math.round((num / availableQuestions) * 100)}%)
+                        </Button>
+                      ))}
+                    </Flex>
+                    <Flex align="center" gap="3" mt="3">
+                      <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)', minWidth: '60px' }}>
+                        Custom:
+                      </Text>
+                      <TextField.Root
+                        type="number"
+                        size="2"
+                        min="1"
+                        max={availableQuestions}
+                        placeholder="Enter number"
+                        value={questionLimit > 0 ? questionLimit.toString() : ''}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (!isNaN(val) && val > 0 && val <= availableQuestions) {
+                            setQuestionLimit(val);
+                          } else if (e.target.value === '') {
+                            setQuestionLimit(0);
+                          }
+                        }}
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.5)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          color: 'white',
+                          flex: 1,
+                        }}
+                      />
+                    </Flex>
+                  </Box>
+                )}
+
+                <Box>
+                  <Text size="2" weight="bold" mb="3" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Test Duration (minutes):</Text>
+                  <Flex gap="2" wrap="wrap">
+                    {[15, 30, 45, 60, 90].map(mins => (
+                      <Button
+                        key={mins}
+                        variant={duration === mins ? 'solid' : 'soft'}
+                        onClick={() => setDuration(mins)}
+                        style={{
+                          background: duration === mins
+                            ? 'linear-gradient(135deg, #667eea, #764ba2)'
+                            : 'rgba(99, 102, 241, 0.2)',
+                          border: duration === mins ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {mins}m
                       </Button>
                     ))}
                   </Flex>
-                  <Flex align="center" gap="3" mt="3">
-                    <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)', minWidth: '60px' }}>
-                      Custom:
-                    </Text>
-                    <TextField.Root
-                      type="number"
+                </Box>
+
+                <Box>
+                  <Flex align="center" justify="between" style={{
+                    padding: '1rem',
+                    background: 'rgba(99, 102, 241, 0.1)',
+                    borderRadius: '0.75rem',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
+                  }}>
+                    <Flex align="center" gap="3">
+                      <Box style={{
+                        width: '36px',
+                        height: '36px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: shuffleEnabled ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(99, 102, 241, 0.2)',
+                        borderRadius: '0.5rem',
+                        transition: 'all 0.3s ease',
+                      }}>
+                        <ShuffleIcon width={18} height={18} style={{ color: 'white' }} />
+                      </Box>
+                      <Flex direction="column" gap="1">
+                        <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
+                          Shuffle Answer Options
+                        </Text>
+                        <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
+                          Randomize the order of answer options
+                        </Text>
+                      </Flex>
+                    </Flex>
+                    <Switch
+                      checked={shuffleEnabled}
+                      onCheckedChange={setShuffleEnabled}
                       size="2"
-                      min="1"
-                      max={availableQuestions}
-                      placeholder="Enter number"
-                      value={questionLimit > 0 ? questionLimit.toString() : ''}
-                      onChange={(e) => {
-                        const val = parseInt(e.target.value);
-                        if (!isNaN(val) && val > 0 && val <= availableQuestions) {
-                          setQuestionLimit(val);
-                        } else if (e.target.value === '') {
-                          setQuestionLimit(0);
-                        }
-                      }}
                       style={{
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        border: '1px solid rgba(99, 102, 241, 0.3)',
-                        color: 'white',
-                        flex: 1,
+                        cursor: 'pointer',
                       }}
                     />
                   </Flex>
                 </Box>
-              )}
 
-              <Box>
-                <Text size="2" weight="bold" mb="3" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>Test Duration (minutes):</Text>
-                <Flex gap="2" wrap="wrap">
-                  {[15, 30, 45, 60, 90].map(mins => (
+                <Flex gap="3" justify="end" mt="2">
+                  <Dialog.Close>
                     <Button
-                      key={mins}
-                      variant={duration === mins ? 'solid' : 'soft'}
-                      onClick={() => setDuration(mins)}
+                      variant="soft"
                       style={{
-                        background: duration === mins 
-                          ? 'linear-gradient(135deg, #667eea, #764ba2)'
-                          : 'rgba(99, 102, 241, 0.2)',
-                        border: duration === mins ? 'none' : '1px solid rgba(99, 102, 241, 0.3)',
-                        fontWeight: 600,
+                        background: 'rgba(99, 102, 241, 0.2)',
+                        border: '1px solid rgba(99, 102, 241, 0.3)',
                       }}
                     >
-                      {mins}m
+                      Cancel
                     </Button>
-                  ))}
-                </Flex>
-              </Box>
-
-              <Box>
-                <Flex align="center" justify="between" style={{
-                  padding: '1rem',
-                  background: 'rgba(99, 102, 241, 0.1)',
-                  borderRadius: '0.75rem',
-                  border: '1px solid rgba(99, 102, 241, 0.2)',
-                }}>
-                  <Flex align="center" gap="3">
-                    <Box style={{
-                      width: '36px',
-                      height: '36px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      background: shuffleEnabled ? 'linear-gradient(135deg, #667eea, #764ba2)' : 'rgba(99, 102, 241, 0.2)',
-                      borderRadius: '0.5rem',
-                      transition: 'all 0.3s ease',
-                    }}>
-                      <ShuffleIcon width={18} height={18} style={{ color: 'white' }} />
-                    </Box>
-                    <Flex direction="column" gap="1">
-                      <Text size="2" weight="bold" style={{ color: 'rgba(226, 232, 240, 0.95)' }}>
-                        Shuffle Answer Options
-                      </Text>
-                      <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.8)' }}>
-                        Randomize the order of answer options
-                      </Text>
-                    </Flex>
-                  </Flex>
-                  <Switch
-                    checked={shuffleEnabled}
-                    onCheckedChange={setShuffleEnabled}
-                    size="2"
+                  </Dialog.Close>
+                  <Button
+                    disabled={selectedWeeks.length === 0}
+                    onClick={handleStartTest}
                     style={{
-                      cursor: 'pointer',
-                    }}
-                  />
-                </Flex>
-              </Box>
-
-              <Flex gap="3" justify="end" mt="2">
-                <Dialog.Close>
-                  <Button 
-                    variant="soft" 
-                    style={{
-                      background: 'rgba(99, 102, 241, 0.2)',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      background: selectedWeeks.length === 0
+                        ? 'rgba(99, 102, 241, 0.3)'
+                        : 'linear-gradient(135deg, #667eea, #764ba2)',
+                      fontWeight: 600,
+                      cursor: selectedWeeks.length === 0 ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    Cancel
+                    Start Test
                   </Button>
-                </Dialog.Close>
-                <Button
-                  disabled={selectedWeeks.length === 0}
-                  onClick={handleStartTest}
-                  style={{
-                    background: selectedWeeks.length === 0 
-                      ? 'rgba(99, 102, 241, 0.3)'
-                      : 'linear-gradient(135deg, #667eea, #764ba2)',
-                    fontWeight: 600,
-                    cursor: selectedWeeks.length === 0 ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  Start Test
-                </Button>
+                </Flex>
               </Flex>
-            </Flex>
-          </Dialog.Content>
-        </Dialog.Root>
-      </Flex>
-    </Container>
+            </Dialog.Content>
+          </Dialog.Root>
+        </Flex>
+      </Container>
     </Box>
   );
 }

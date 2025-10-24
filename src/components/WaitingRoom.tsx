@@ -72,7 +72,7 @@ export default function WaitingRoom() {
                 const userAnswers = summaryResponse.data.userAnswers || [];
                 
                 if (userAnswers.length > 0) {
-                  console.log('Contest is live and user has previous answers, redirecting to play...');
+                  // console.log('Contest is live and user has previous answers, redirecting to play...');
                   navigate(`/contest/${contestId}/play`, { 
                     state: { 
                       contestMeta: { 
@@ -87,7 +87,7 @@ export default function WaitingRoom() {
                 }
               }
             } catch (summaryError) {
-              console.log('User has not started the contest yet');
+              // console.log('User has not started the contest yet');
             }
           }
         }
@@ -103,19 +103,19 @@ export default function WaitingRoom() {
       const payload = user;
       const currentUserId = payload?._id;
       
-      console.log('🔍 Frontend - Decoded JWT payload:', {
-        userId: payload?._id,
-        email: payload?.email
-      });
-      console.log('👤 Frontend - Current user ID:', currentUserId);
-      console.log('🎯 Frontend - Contest admin ID:', contestMeta?.adminId);
+      // console.log('🔍 Frontend - Decoded JWT payload:', {
+        // userId: payload?._id,
+        // email: payload?.email
+      // });
+      // console.log('👤 Frontend - Current user ID:', currentUserId);
+      // console.log('🎯 Frontend - Contest admin ID:', contestMeta?.adminId);
       
       // Check if current user is the contest admin
       if (contestMeta && contestMeta.adminId === currentUserId) {
         setIsAdmin(true);
-        console.log('✅ Frontend - User is admin');
+        // console.log('✅ Frontend - User is admin');
       } else {
-        console.log('❌ Frontend - User is NOT admin');
+        // console.log('❌ Frontend - User is NOT admin');
       }
     } catch (err) {
       // Silently handle token error
@@ -130,14 +130,14 @@ export default function WaitingRoom() {
 
     socketInstance.on('connect', () => {
       setConnected(true);
-      console.log("here we go 1")
+      // console.log("here we go 1")
       // Join the contest room
       socketInstance.emit('joinContest', contestId, (response: any) => {
-        console.log(response);
+        // console.log(response);
         if (!response.success) {
-          console.log("here we go 2");
+          // console.log("here we go 2");
           setError(response.message || 'Failed to join contest');
-          console.log(response.message);
+          // console.log(response.message);
           // Don't redirect immediately, show error message
         }
       });
@@ -149,7 +149,7 @@ export default function WaitingRoom() {
     });
 
     socketInstance.on('updateParticipants', (updatedParticipants: Participant[]) => {
-      console.log('📋 Frontend - Received updateParticipants:', updatedParticipants);
+      // console.log('📋 Frontend - Received updateParticipants:', updatedParticipants);
       setParticipants(updatedParticipants);
     });
 

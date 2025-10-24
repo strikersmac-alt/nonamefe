@@ -68,7 +68,7 @@ export default function ContestSummary() {
         }
       );
 
-      console.log('Contest summary response:', response.data);
+      // console.log('Contest summary response:', response.data);
       
       if (response.data.success) {
         setQuestions(response.data.questions || []);

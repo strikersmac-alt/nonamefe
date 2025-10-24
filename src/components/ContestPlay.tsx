@@ -170,7 +170,7 @@ export default function ContestPlay() {
                 
                 if (firstUnansweredIndex !== -1) {
                   setCurrentQuestionIndex(firstUnansweredIndex);
-                  console.log(`Resuming from question ${firstUnansweredIndex + 1} with score ${previousScore}`);
+                  // console.log(`Resuming from question ${firstUnansweredIndex + 1} with score ${previousScore}`);
                 } else {
                   const completedContests = JSON.parse(localStorage.getItem('completedContests') || '[]');
                   if (!completedContests.includes(contestId)) {

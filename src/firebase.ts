@@ -32,7 +32,7 @@ if (typeof window !== "undefined") {
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);
-      console.log("Firebase Analytics initialized");
+      // console.log("Firebase Analytics initialized");
     } else {
       console.warn("Analytics not supported in this environment");
     }

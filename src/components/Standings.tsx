@@ -74,7 +74,7 @@ export default function Standings() {
         });
 
         if (!isLive || fromProfile) {
-          console.log('Contest ended or viewing from profile - using REST API for standings');
+          // console.log('Contest ended or viewing from profile - using REST API for standings');
           
           const standingsResponse = await axios.get(
             `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
@@ -85,7 +85,7 @@ export default function Standings() {
           }
           setLoading(false);
         } else {
-          console.log('Contest is live - using socket for real-time standings');
+          // console.log('Contest is live - using socket for real-time standings');
           
           socketInstance = io(`${import.meta.env.VITE_API_URL}`, {
             withCredentials: true,
@@ -93,7 +93,7 @@ export default function Standings() {
 
           // Set a timeout to fetch standings via REST if socket takes too long
           socketTimeout = setTimeout(async () => {
-            console.log('Socket timeout - fetching standings via REST API');
+            // console.log('Socket timeout - fetching standings via REST API');
             try {
               const restResponse = await axios.get(
                 `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
@@ -109,13 +109,13 @@ export default function Standings() {
           }, 3000); // 3 second timeout
 
           socketInstance.on('connect', () => {
-            console.log('Connected to socket, joining contest:', contestId);
+            // console.log('Connected to socket, joining contest:', contestId);
             socketInstance.emit('joinContest', contestId, async (response: any) => {
-              console.log('Join contest response:', response);
+              // console.log('Join contest response:', response);
               
               // Request initial standings after joining
               socketInstance.emit('getStandings', contestId, async (standingsResponse: any) => {
-                console.log('Initial standings response:', standingsResponse);
+                // console.log('Initial standings response:', standingsResponse);
                 clearTimeout(socketTimeout); // Clear timeout since we got response
                 
                 if (standingsResponse.success && standingsResponse.standings) {
@@ -123,7 +123,7 @@ export default function Standings() {
                   setLoading(false);
                 } else {
                   // Fallback to REST API if socket method fails
-                  console.log('Socket standings failed, using REST API fallback');
+                  // console.log('Socket standings failed, using REST API fallback');
                   try {
                     const restResponse = await axios.get(
                       `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
@@ -141,7 +141,7 @@ export default function Standings() {
           });
 
           socketInstance.on('updateStandings', (updatedStandings: Standing[]) => {
-            console.log('Received updated standings:', updatedStandings);
+            // console.log('Received updated standings:', updatedStandings);
             if (updatedStandings && Array.isArray(updatedStandings)) {
               setStandings(updatedStandings);
               setLoading(false);
@@ -191,7 +191,7 @@ export default function Standings() {
   // };
 
 
-  console.log('Standings render - loading:', loading, 'standings:', standings, 'length:', standings.length);
+  // console.log('Standings render - loading:', loading, 'standings:', standings, 'length:', standings.length);
 
   if (loading) {
     return <LoadingSpinner message="Loading standings..." />;

@@ -16,7 +16,7 @@ const LogoutButton: React.FC = () => {
         withCredentials: true 
       });
       logout();
-      console.log('Logged out successfully');
+      // console.log('Logged out successfully');
       window.location.href = '/'; 
     } catch (error) {
       console.error('Logout error:', error);

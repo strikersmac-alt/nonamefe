@@ -24,7 +24,7 @@ const GoogleSignInButton: React.FC = () => {
           email: response.data.user.email,
           profilePicture: response.data.user.profilePicture,
         });
-        console.log('Logged in:', response.data.user);
+        // console.log('Logged in:', response.data.user);
       } else {
         console.error('Backend auth failed');
       }

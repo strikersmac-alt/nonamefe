@@ -728,6 +728,19 @@ html {
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
+.logo-box:hover .logo-image {
+  transform: scale(1.3);
+}
+
+/* Prevent logo image from being dragged/copied */
+.logo-image {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
 /* Navigation button hover effects */
 button[variant="ghost"]:hover {
   background: rgba(99, 102, 241, 0.15) !important;

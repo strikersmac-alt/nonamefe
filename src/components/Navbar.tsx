@@ -92,25 +92,30 @@ export default function Navbar() {
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 4px 16px rgba(102, 126, 234, 0.4)',
               transition: 'transform 0.2s ease',
+              overflow: 'hidden',
             }}
             className="logo-box"
           >
-            <Text
-              size="5"
-              weight="bold"
+            <img
+              src="/logo4.png"
+              alt="MindMuse"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
               style={{
-                color: 'white',
-                fontFamily: 'Poppins, sans-serif',
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                transition: 'transform 0.3s ease',
+                userSelect: 'none',
+                pointerEvents: 'none',
               }}
-            >
-              M
-            </Text>
+              className="logo-image"
+            />
           </Box>
           <Text
             size="5"

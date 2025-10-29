@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Flex, Heading, Text, Card, Container, Button, Badge } from '@radix-ui/themes';
-import { HomeIcon, CheckCircledIcon, CrossCircledIcon, ClockIcon, StarIcon } from '@radix-ui/react-icons';
+import { HomeIcon, CheckCircledIcon, CrossCircledIcon, ClockIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
@@ -134,8 +134,7 @@ export default function ContestSummary() {
               fontWeight: 800,
               fontFamily: 'Poppins, sans-serif',
             }}>
-              <StarIcon style={{ display: 'inline', marginRight: '0.5rem' }} />
-              Contest Summary
+              
             </Heading>
             <Flex gap="2">
               <Button 

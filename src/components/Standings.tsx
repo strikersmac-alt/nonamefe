@@ -15,7 +15,7 @@ import {
   HomeIcon,
   StarFilledIcon,
   CheckCircledIcon,
-  StarIcon,
+  
   ClockIcon,
 } from "@radix-ui/react-icons";
 import { io } from "socket.io-client";

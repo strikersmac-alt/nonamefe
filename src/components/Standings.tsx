@@ -289,9 +289,10 @@ export default function Standings() {
               fontWeight: 800,
               fontFamily: "Poppins, sans-serif",
               textAlign: "center",
+              paddingBottom: "0.4rem",
             }}
           >
-            <StarIcon style={{ display: "inline", marginRight: "0.5rem" }} />
+            
             {contestInfo?.isLive ? "Tentative Results" : "Final Standings"}
           </Heading>
 

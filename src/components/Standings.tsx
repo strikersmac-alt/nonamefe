@@ -12,11 +12,11 @@ import {
   Avatar,
 } from "@radix-ui/themes";
 import {
-  HomeIcon,
   StarFilledIcon,
   CheckCircledIcon,
-  
   ClockIcon,
+  LockClosedIcon,
+  CrossCircledIcon,
 } from "@radix-ui/react-icons";
 import { io } from "socket.io-client";
 import axios from "axios";
@@ -42,6 +42,7 @@ interface ContestMeta {
   timeZone: string;
   id: string;
   adminId: string;
+  status: string;
 }
 
 const formatTime = (ms: number | string | undefined) => {
@@ -292,7 +293,6 @@ export default function Standings() {
               paddingBottom: "0.4rem",
             }}
           >
-            
             {contestInfo?.isLive ? "Tentative Results" : "Final Standings"}
           </Heading>
 
@@ -610,40 +610,80 @@ export default function Standings() {
         )}
 
         {/* Action Buttons */}
-        <Flex justify="center" gap="4" mt="6" wrap="wrap">
-          <Button
-            size="3"
-            variant="soft"
-            color="gray"
-            onClick={() => navigate("/")}
-            style={{
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            <HomeIcon />
-            Back to Home
-          </Button>
-
-          <Button
-            size="3"
-            variant="soft"
-            onClick={() =>
-              navigate(`/contest/${contestId}/summary`, {
-                state: { contestMeta, userScore: finalScore },
-              })
-            }
-            style={{
-              background: "rgba(59, 130, 246, 0.2)",
-              backdropFilter: "blur(10px)",
-              border: "1px solid rgba(59, 130, 246, 0.3)",
-              cursor: "pointer",
-              fontWeight: 600,
-            }}
-          >
-            <CheckCircledIcon />
-            View Summary
-          </Button>
+        <Flex justify="center" gap="4" mt="6" wrap="wrap" style={{ maxWidth: "600px", margin: "0 auto", width: "100%" }}>
+          {userStanding ? (
+            <Button
+              size="3"
+              variant="soft"
+              onClick={() =>
+                navigate(`/contest/${contestId}/summary`, {
+                  state: { contestMeta, userScore: finalScore },
+                })
+              }
+              style={{
+                background: "rgba(59, 130, 246, 0.2)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(59, 130, 246, 0.3)",
+                cursor: "pointer",
+                fontWeight: 600,
+                flex: 1,
+                minWidth: "200px",
+                height: "44px",
+              }}
+            >
+              <CheckCircledIcon />
+              View Summary
+            </Button>
+          ) : (
+            <Box
+              style={{
+                background: contestMeta.status === "end" 
+                  ? "linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)"
+                  : "linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)",
+                border: contestMeta.status === "end"
+                  ? "1.5px solid rgba(239, 68, 68, 0.35)"
+                  : "1.5px solid rgba(251, 191, 36, 0.35)",
+                borderRadius: "var(--radius-3)",
+                backdropFilter: "blur(12px)",
+                boxShadow: contestMeta.status === "end"
+                  ? "0 4px 16px rgba(239, 68, 68, 0.15)"
+                  : "0 4px 16px rgba(251, 191, 36, 0.15)",
+                flex: 1,
+                minWidth: "200px",
+                height: "44px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Flex align="center" gap="2">
+                {contestMeta.status === "end" ? (
+                  <CrossCircledIcon
+                    width="18"
+                    height="18"
+                    style={{ color: "rgba(252, 165, 165, 0.95)" }}
+                  />
+                ) : (
+                  <LockClosedIcon
+                    width="18"
+                    height="18"
+                    style={{ color: "rgba(253, 224, 71, 0.95)" }}
+                  />
+                )}
+                <Text
+                  size="3"
+                  weight="medium"
+                  style={{
+                    color: contestMeta.status === "end"
+                      ? "rgba(252, 165, 165, 0.95)"
+                      : "rgba(253, 224, 71, 0.95)",
+                  }}
+                >
+                  {contestMeta.status === "end" ? "Contest Has Ended" : "Contest is Full"}
+                </Text>
+              </Flex>
+            </Box>
+          )}
 
           <Button
             size="3"
@@ -652,6 +692,9 @@ export default function Standings() {
               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
               cursor: "pointer",
               fontWeight: 600,
+              flex: 1,
+              minWidth: "200px",
+              height: "44px",
             }}
           >
             <StarFilledIcon />

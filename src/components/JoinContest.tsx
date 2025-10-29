@@ -18,6 +18,8 @@ interface ContestMeta {
   status: string;
   id: string;
   adminId: string;
+  users: string[];
+  capacity?: number;
 }
 
 export default function JoinContest() {
@@ -40,7 +42,7 @@ export default function JoinContest() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
+    const currentUserId = user?._id; // Get current user ID
     try {
       // Fetch contest details by code
       const response = await axios.get<{ success: boolean; meta: ContestMeta }>(
@@ -49,6 +51,7 @@ export default function JoinContest() {
 
       if (response.data.success && response.data.meta) {
         const contestMeta = response.data.meta;
+        const contestId = contestMeta.id;
         
         // Check if contest has ended - redirect to standings
         if (contestMeta.status === 'end') {
@@ -57,6 +60,50 @@ export default function JoinContest() {
           });
           return;
         }
+
+        // Check if current user is already a participant or the admin
+        const isParticipant = currentUserId && (contestMeta.users.includes(currentUserId) || contestMeta.adminId === currentUserId);
+
+        // Contest is Live?
+        if (contestMeta.isLive) {
+          if (isParticipant) {
+            // If already a participant, go to waiting room (it handles resume logic)
+            // console.log("Contest live, user is participant, navigating to waiting room...");
+            navigate(`/contest/${contestId}/waiting`, { state: { contestMeta } });
+          } else {
+            // If not a participant, go directly to view live standings
+            // console.log("Contest live, user is observer, navigating to standings...");
+            navigate(`/contest/${contestId}/standings`, { state: { contestMeta } });
+          }
+          return; // Stop further checks
+        }
+
+        // Contest is Waiting (Not Live, Not Ended)
+        if (contestMeta.status === 'waiting') {
+          const participantCount = contestMeta.users.length;
+          // Determine capacity (handle different modes)
+          const effectiveCapacity = contestMeta.mode === 'duel' ? 2 : contestMeta.capacity; // Default to 2 for duel
+
+          if (isParticipant) {
+             // Already joined, go to waiting room
+            //  console.log("Contest waiting, user already participant, navigating to waiting room...");
+             navigate(`/contest/${contestId}/waiting`, { state: { contestMeta } });
+          } else if (effectiveCapacity && participantCount >= effectiveCapacity) {
+             // Contest is full for new participants
+            //  console.log("Contest waiting but full, navigating to standings...");
+             setError(`Contest is full (Capacity: ${effectiveCapacity}). Viewing standings.`);
+             // Allow viewing standings even if full
+             setTimeout(() => navigate(`/contest/${contestId}/standings`, { state: { contestMeta } }), 2000); // Delay nav slightly
+          } else {
+             // Contest is waiting and has space (or no capacity limit)
+            //  console.log("Contest waiting, user can join, navigating to waiting room...");
+             // Proceed to waiting room to actually join via socket
+             navigate(`/contest/${contestId}/waiting`, { state: { contestMeta } });
+          }
+          return; // Stop further checks
+        }
+
+
 
         if (user?._id && contestMeta.contestType && contestMeta.mode) {
           const timestamp = Date.now();

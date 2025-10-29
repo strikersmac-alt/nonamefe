@@ -30,6 +30,7 @@ interface Standing {
   name: string;
   score: number;
   timeTaken: number;
+  attempted: number;
 }
 
 interface ContestMeta {
@@ -134,7 +135,9 @@ export default function Standings() {
           socketTimeout = setTimeout(async () => {
             try {
               const restResponse = await axios.get(
-                `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
+                `${
+                  import.meta.env.VITE_API_URL
+                }/api/contest/${contestId}/standings`
               );
               if (restResponse.data.success && restResponse.data.standings) {
                 setStandings(restResponse.data.standings);
@@ -168,7 +171,9 @@ export default function Standings() {
                     } else {
                       try {
                         const restResponse = await axios.get(
-                          `${import.meta.env.VITE_API_URL}/api/contest/${contestId}/standings`
+                          `${
+                            import.meta.env.VITE_API_URL
+                          }/api/contest/${contestId}/standings`
                         );
                         if (restResponse.data.success) {
                           setStandings(restResponse.data.standings);
@@ -228,6 +233,11 @@ export default function Standings() {
         return "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
     }
   };
+
+  // Compute user's own standing for "Your Score" display (works for both live and final)
+  const userStanding = standings.find((s) => s.userId === currentUserId);
+  const yourScore = userStanding?.score ?? finalScore ?? 0;
+  const yourAttempted = userStanding?.attempted ?? 0;
 
   if (loading) {
     return <LoadingSpinner message="Loading standings..." />;
@@ -306,7 +316,7 @@ export default function Standings() {
             </Flex>
           )}
 
-          {finalScore !== undefined && (
+          {userStanding && (
             <Card
               style={{
                 background: "rgba(59, 130, 246, 0.1)",
@@ -328,7 +338,7 @@ export default function Standings() {
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  {finalScore}
+                  {yourScore}/{yourAttempted} {/* Progress format */}
                 </Text>
               </Flex>
             </Card>
@@ -421,7 +431,7 @@ export default function Standings() {
                             WebkitTextFillColor: "transparent",
                           }}
                         >
-                          {standing.score}
+                          {standing.score}/{standing.attempted}
                         </Text>
                         <Text
                           size="1"
@@ -575,7 +585,7 @@ export default function Standings() {
                             WebkitTextFillColor: "transparent",
                           }}
                         >
-                          {standing.score}
+                          {standing.score}/{standing.attempted}
                         </Text>
                         <Text
                           size="1"

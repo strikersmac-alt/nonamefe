@@ -15,6 +15,7 @@ interface ContestMeta {
   duration: number;
   startTime: string;
   timeZone: string;
+  status: string;
   id: string;
   adminId: string;
 }
@@ -49,11 +50,13 @@ export default function JoinContest() {
       if (response.data.success && response.data.meta) {
         const contestMeta = response.data.meta;
         
-        // Check if contest is already live
-        // if (contestMeta.isLive) {
-        //   setError('This contest has already started. You cannot join now.');
-        //   return;
-        // }
+        // Check if contest has ended - redirect to standings
+        if (contestMeta.status === 'end') {
+          navigate(`/contest/${contestMeta.id}/standings`, { 
+            state: { contestMeta } 
+          });
+          return;
+        }
 
         if (user?._id && contestMeta.contestType && contestMeta.mode) {
           const timestamp = Date.now();

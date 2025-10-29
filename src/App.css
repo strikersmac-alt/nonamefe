@@ -757,6 +757,63 @@ button[variant="ghost"]:hover {
   }
 }
 
+/* ========================
+   HAMBURGER MENU STYLES
+   ======================== */
+
+/* Subtle pulse animation for hamburger button to guide users */
+@keyframes hamburgerPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    background: transparent;
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0);
+    background: rgba(99, 102, 241, 0.1);
+  }
+}
+
+.hamburger-pulse {
+  animation: hamburgerPulse 2s ease-in-out infinite;
+}
+
+/* Mobile hamburger menu trigger visibility */
+.mobile-menu-trigger {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-menu-trigger {
+    display: block;
+  }
+}
+
+/* Enhanced dropdown animations */
+.mobile-navigation-menu {
+  animation: dropdownSlide 0.3s ease-out;
+}
+
+/* Menu item hover effect */
+.mobile-navigation-menu [role="menuitem"]:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+  transform: translateX(4px);
+  transition: all 0.2s ease;
+}
+
+/* Active/touch feedback for mobile */
+.mobile-navigation-menu [role="menuitem"]:active {
+  background: rgba(99, 102, 241, 0.3) !important;
+  transform: scale(0.98) translateX(4px);
+}
+
+/* Better touch target sizes for mobile */
+@media (max-width: 767px) {
+  .mobile-menu-trigger button {
+    min-height: 34px;
+    min-width: 34px;
+  }
+}
+
 /* Mobile menu responsive styles */
 @media (max-width: 767px) {
   .desktop-nav {
@@ -775,6 +832,10 @@ button[variant="ghost"]:hover {
   
   .mobile-menu-items {
     display: none;
+  }
+  
+  .mobile-menu-trigger {
+    display: none !important;
   }
 }
 

@@ -1,7 +1,7 @@
 import { Box, Flex, Button, Text, Avatar, DropdownMenu } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { PersonIcon, RocketIcon, PlusIcon, ExitIcon, DashboardIcon, HomeIcon } from '@radix-ui/react-icons';
+import { PersonIcon, RocketIcon, PlusIcon, ExitIcon, DashboardIcon, HomeIcon, HamburgerMenuIcon } from '@radix-ui/react-icons';
 import { useState, useEffect } from 'react';
 import GoogleSignInButton from './OAuth';
 
@@ -10,6 +10,7 @@ export default function Navbar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const [scrolled, setScrolled] = useState(false);
+  const [showPulse, setShowPulse] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,6 +18,12 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Hide pulse animation after 5 seconds or on first interaction
+    const timer = setTimeout(() => setShowPulse(false), 5000);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLogout = async () => {
@@ -122,7 +129,89 @@ export default function Navbar() {
 
         {/* Navigation Items */}
         {user ? (
-          <Flex align="center" gap="6" style={{ flexWrap: 'wrap' }}>
+          <Flex align="center" gap="3" style={{ flexWrap: 'nowrap' }}>
+            {/* Mobile Hamburger Menu - More Discoverable */}
+            <Box className="mobile-menu-trigger">
+              <DropdownMenu.Root onOpenChange={() => setShowPulse(false)}>
+                <DropdownMenu.Trigger>
+                  <Button
+                    variant="ghost"
+                    size="1"
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                      borderRadius: '50%',
+                      padding: '0.4rem',
+                      width: '34px',
+                      height: '34px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    className={showPulse ? 'hamburger-pulse' : ''}
+                  >
+                    <HamburgerMenuIcon width="16" height="16" />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.98)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(99, 102, 241, 0.3)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                    minWidth: '220px',
+                    marginTop: '8px',
+                  }}
+                  className="mobile-navigation-menu"
+                >
+                  <DropdownMenu.Item
+                    onClick={() => handleNav('/')}
+                    style={{
+                      cursor: 'pointer',
+                      color: 'rgba(226, 232, 240, 0.9)',
+                      padding: '0.75rem 1rem',
+                      fontSize: '15px',
+                    }}
+                  >
+                    <HomeIcon width="16" height="16" /> Home
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onClick={() => handleNav('/create-contest')}
+                    style={{
+                      cursor: 'pointer',
+                      color: 'rgba(226, 232, 240, 0.9)',
+                      padding: '0.75rem 1rem',
+                      fontSize: '15px',
+                    }}
+                  >
+                    <PlusIcon width="16" height="16" /> Create Contest
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onClick={() => handleNav('/join-contest')}
+                    style={{
+                      cursor: 'pointer',
+                      color: 'rgba(226, 232, 240, 0.9)',
+                      padding: '0.75rem 1rem',
+                      fontSize: '15px',
+                    }}
+                  >
+                    <RocketIcon width="16" height="16" /> Join Contest
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    onClick={() => handleNav('/practice')}
+                    style={{
+                      cursor: 'pointer',
+                      color: 'rgba(226, 232, 240, 0.9)',
+                      padding: '0.75rem 1rem',
+                      fontSize: '15px',
+                    }}
+                  >
+                    <DashboardIcon width="16" height="16" /> NPTEL
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </Box>
+
             {/* Desktop Navigation */}
             <Flex
               gap="4"
@@ -186,7 +275,7 @@ export default function Navbar() {
               </Button>
             </Flex>
 
-            {/* User Profile Dropdown */}
+            {/* User Profile Dropdown - Separated from Navigation */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger>
                 <Button
@@ -210,11 +299,12 @@ export default function Navbar() {
               </DropdownMenu.Trigger>
               <DropdownMenu.Content
                 style={{
-                  background: 'rgba(15, 23, 42, 0.95)',
+                  background: 'rgba(15, 23, 42, 0.98)',
                   backdropFilter: 'blur(20px)',
                   border: '1px solid rgba(99, 102, 241, 0.3)',
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                  minWidth: '200px',
+                  minWidth: '180px',
+                  marginTop: '8px',
                 }}
               >
                 <DropdownMenu.Item
@@ -222,61 +312,23 @@ export default function Navbar() {
                   style={{
                     cursor: 'pointer',
                     color: 'rgba(226, 232, 240, 0.9)',
+                    padding: '0.75rem 1rem',
+                    fontSize: '15px',
                   }}
                 >
-                  <PersonIcon /> My Profile
+                  <PersonIcon width="16" height="16" /> My Profile
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator style={{ background: 'rgba(99, 102, 241, 0.2)' }} />
-                
-                {/* Mobile Menu Items */}
-                <Box className="mobile-menu-items">
-                  <DropdownMenu.Item
-                    onClick={() => handleNav('/')}
-                    style={{
-                      cursor: 'pointer',
-                      color: 'rgba(226, 232, 240, 0.9)',
-                    }}
-                  >
-                    <HomeIcon /> Home
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    onClick={() => handleNav('/create-contest')}
-                    style={{
-                      cursor: 'pointer',
-                      color: 'rgba(226, 232, 240, 0.9)',
-                    }}
-                  >
-                    <PlusIcon /> Create Contest
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    onClick={() => handleNav('/join-contest')}
-                    style={{
-                      cursor: 'pointer',
-                      color: 'rgba(226, 232, 240, 0.9)',
-                    }}
-                  >
-                    <RocketIcon /> Join Contest
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Item
-                    onClick={() => handleNav('/practice')}
-                    style={{
-                      cursor: 'pointer',
-                      color: 'rgba(226, 232, 240, 0.9)',
-                    }}
-                  >
-                    <DashboardIcon /> NPTEL
-                  </DropdownMenu.Item>
-                  <DropdownMenu.Separator style={{ background: 'rgba(99, 102, 241, 0.2)' }} />
-                </Box>
-                
                 <DropdownMenu.Item
                   onClick={handleLogout}
                   style={{
                     cursor: 'pointer',
                     color: '#f87171',
+                    padding: '0.75rem 1rem',
+                    fontSize: '15px',
                   }}
                 >
-                  <ExitIcon /> Logout
+                  <ExitIcon width="16" height="16" /> Logout
                 </DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Root>

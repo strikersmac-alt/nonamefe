@@ -54,7 +54,7 @@ export default function Practice() {
   const location = useLocation();
   const { user } = useAuthStore();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [coursesLoading, setCoursesLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [selectedWeeks, setSelectedWeeks] = useState<number[]>([]);
   const [duration, setDuration] = useState(30);
@@ -130,21 +130,20 @@ export default function Practice() {
         // console.log("hello",response);
       } catch (error) {
         console.error('Error fetching questions:', error);
-      } finally {
-        setLoading(false);
       }
     };
     fetchQuestions();
   }, [selectedWeeks]);
 
   const fetchCourses = async () => {
+    setCoursesLoading(true);
     try {
       const response = await axios.get<{ courses: Course[] }>(`${import.meta.env.VITE_API_URL}/api/course/courses`);
       setCourses(response.data.courses);
     } catch (error) {
-      setLoading(false);
+      // keep courses empty on error
     } finally {
-      setLoading(false);
+      setCoursesLoading(false);
     }
   };
 
@@ -927,7 +926,7 @@ export default function Practice() {
             </Box>
           </Flex>
 
-          {loading ? (
+          {coursesLoading ? (
             <LoadingSpinner message="Loading courses..." size="small" />
           ) : courses.length === 0 ? (
             <Card className="hero-card" style={{

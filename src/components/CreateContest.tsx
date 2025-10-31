@@ -147,7 +147,7 @@ export default function CreateContest() {
     setResponse(null);
 
     // Progress animation - complete in 13 seconds
-    const totalDuration = 13000; // 13 seconds
+    const totalDuration = 15000; // 13 seconds
     const intervalTime = 100; // Update every 100ms
     const incrementPerInterval = (100 / totalDuration) * intervalTime;
     

@@ -260,7 +260,6 @@ export default function Standings() {
       <div className="floating-orbs">
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
-        <div className="orb orb-3"></div>
       </div>
 
       <Container
@@ -488,8 +487,6 @@ export default function Standings() {
               position: "relative",
             }}
           >
-            <div className="card-shine"></div>
-
             <Heading
               size="5"
               style={{

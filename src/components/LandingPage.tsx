@@ -158,12 +158,10 @@ const FloatingOrbs = () => (
   <div className="floating-orbs">
     <div className="orb orb-1"></div>
     <div className="orb orb-2"></div>
-    <div className="orb orb-3"></div>
   </div>
 );
 
 export default function LandingPage() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   // Typing animation for dynamic text
   const typingText = useTypingEffect([
     'competitive duels',
@@ -171,14 +169,6 @@ export default function LandingPage() {
     'solo missions',
     'global leaderboards'
   ], 100, 70, 1800);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   return (
     <Box style={{
@@ -192,15 +182,6 @@ export default function LandingPage() {
       paddingTop: '70px',
     }}>
       <FloatingOrbs />
-
-      {/* Cursor glow effect */}
-      <div
-        className="cursor-glow"
-        style={{
-          left: mousePosition.x,
-          top: mousePosition.y,
-        }}
-      />
 
       <Container size="3" px={{ initial: '4', sm: '5', md: '6' }} pt={{ initial: '4', md: '5' }} pb="6" style={{ flex: 1, position: 'relative', zIndex: 1 }}>
         {/* Hero Section */}
@@ -219,9 +200,6 @@ export default function LandingPage() {
             marginBottom: 'clamp(1rem, 3vw, 1.5rem)',
             position: 'relative',
           }}>
-            <div className="card-shine"></div>
-
-
             <Heading size={{ initial: '7', sm: '8', md: '9' }} className="glow-text-enhanced" style={{
               letterSpacing: '-0.02em',
               fontWeight: 800,
@@ -324,8 +302,6 @@ export default function LandingPage() {
               overflow: 'hidden',
             }}>
               <Flex direction="column" align="center" justify="center" gap="3" p="6" style={{ textAlign: 'center' }}>
-                <div className="feature-glow" style={{ background: feat.gradient }}></div>
-
                 <Box className="feature-icon-box" style={{
                   background: feat.gradient,
                   borderRadius: '50%',

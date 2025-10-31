@@ -444,7 +444,6 @@ export default function ContestPlay() {
       <div className="floating-orbs">
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
-        <div className="orb orb-3"></div>
       </div>
 
       <Container size="3" px={{ initial: '4', sm: '5', md: '6' }} pt={{ initial: '4', md: '5' }} pb="4" style={{ flex: 1, position: 'relative', zIndex: 1 }}>
@@ -551,8 +550,6 @@ export default function ContestPlay() {
           padding: window.innerWidth < 768 ? '1.25rem' : '1.75rem',
           position: 'relative',
         }}>
-          <div className="card-shine"></div>
-
           <Flex direction="column" gap="4">
             {/* Topic Badge */}
             <Badge size="2" color="cyan" variant="soft" style={{ width: 'fit-content' }}>

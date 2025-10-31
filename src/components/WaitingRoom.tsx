@@ -295,7 +295,6 @@ export default function WaitingRoom() {
       <div className="floating-orbs">
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>
-        <div className="orb orb-3"></div>
       </div>
 
       <Container
@@ -505,8 +504,6 @@ export default function WaitingRoom() {
               position: "relative",
             }}
           >
-            <div className="card-shine"></div>
-
             <Flex direction="column" gap="4">
               <Flex justify="between" align="center">
                 <Heading size="5" style={{ color: "#e2e8f0", fontWeight: 700 }}>

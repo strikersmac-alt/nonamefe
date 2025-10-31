@@ -9,7 +9,6 @@ export default function Navbar() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const [scrolled, setScrolled] = useState(false);
-  const [showPulse, setShowPulse] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,12 +16,6 @@ export default function Navbar() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // Hide pulse animation after 5 seconds or on first interaction
-    const timer = setTimeout(() => setShowPulse(false), 5000);
-    return () => clearTimeout(timer);
   }, []);
 
   const handleNav = (to: string) => {
@@ -123,7 +116,7 @@ export default function Navbar() {
           <Flex align="center" gap="3" style={{ flexWrap: 'nowrap' }}>
             {/* Mobile Hamburger Menu - More Discoverable */}
             <Box className="mobile-menu-trigger">
-              <DropdownMenu.Root onOpenChange={() => setShowPulse(false)}>
+              <DropdownMenu.Root>
                 <DropdownMenu.Trigger>
                   <Button
                     variant="ghost"
@@ -139,7 +132,6 @@ export default function Navbar() {
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
-                    className={showPulse ? 'hamburger-pulse' : ''}
                   >
                     <HamburgerMenuIcon width="16" height="16" />
                   </Button>

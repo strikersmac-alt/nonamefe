@@ -430,7 +430,6 @@ export default function ContestPlay() {
 
   return (
     <Box 
-      data-contest-play
       style={{
         minHeight: '100vh',
         background: 'radial-gradient(ellipse at 60% 20%, #203a55 0%, #12141c 60%, #090a10 100%)',

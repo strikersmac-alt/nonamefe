@@ -63,6 +63,15 @@ export default function WaitingRoom() {
   const [linkCopied, setLinkCopied] = useState(false);
   const user = useAuthStore((state) => state.user);
   useDocumentTitle("MindMuse - Waiting Room");
+  
+  // Add class to body for mobile styling (hide bottom nav)
+  useEffect(() => {
+    document.body.classList.add('contest-play-page');
+    return () => {
+      document.body.classList.remove('contest-play-page');
+    };
+  }, []);
+  
   useEffect(() => {
     // Check if contest is already completed
     const completedContests = JSON.parse(
@@ -279,6 +288,7 @@ export default function WaitingRoom() {
         position: "relative",
         overflow: "hidden",
         paddingTop: "70px",
+        paddingBottom: "0",
       }}
     >
       {/* Floating Orbs */}

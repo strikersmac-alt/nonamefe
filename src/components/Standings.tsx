@@ -634,7 +634,7 @@ export default function Standings() {
               <CheckCircledIcon />
               View Summary
             </Button>
-          ) : (
+          ) : contestMeta ? (
             <Box
               style={{
                 background: contestMeta.status === "end" 
@@ -683,7 +683,7 @@ export default function Standings() {
                 </Text>
               </Flex>
             </Box>
-          )}
+          ) : null}
 
           <Button
             size="3"

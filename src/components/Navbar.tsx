@@ -1,14 +1,13 @@
 import { Box, Flex, Button, Text, Avatar, DropdownMenu } from '@radix-ui/themes';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { PersonIcon, RocketIcon, PlusIcon, ExitIcon, DashboardIcon, HomeIcon, HamburgerMenuIcon } from '@radix-ui/react-icons';
+import { RocketIcon, PlusIcon, DashboardIcon, HomeIcon, HamburgerMenuIcon } from '@radix-ui/react-icons';
 import { useState, useEffect } from 'react';
 import GoogleSignInButton from './OAuth';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
   const [scrolled, setScrolled] = useState(false);
   const [showPulse, setShowPulse] = useState(true);
 
@@ -25,19 +24,6 @@ export default function Navbar() {
     const timer = setTimeout(() => setShowPulse(false), 5000);
     return () => clearTimeout(timer);
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-      logout();
-      navigate('/');
-    } catch (error) {
-      // Silently handle logout error
-    }
-  };
 
   const handleNav = (to: string) => {
     const currentPath = window.location.pathname;
@@ -280,63 +266,26 @@ export default function Navbar() {
               </Button>
             </Flex>
 
-            {/* User Profile Dropdown - Separated from Navigation */}
-            <DropdownMenu.Root>
-              <DropdownMenu.Trigger>
-                <Button
-                  variant="ghost"
-                  style={{
-                    cursor: 'pointer',
-                    padding: '0.5rem',
-                    borderRadius: '50%',
-                  }}
-                >
-                  <Avatar
-                    src={user.profilePicture}
-                    fallback={user.name?.charAt(0) || 'U'}
-                    size="2"
-                    style={{
-                      border: '2px solid rgba(99, 102, 241, 0.5)',
-                      boxShadow: '0 0 12px rgba(99, 102, 241, 0.3)',
-                    }}
-                  />
-                </Button>
-              </DropdownMenu.Trigger>
-              <DropdownMenu.Content
+            {/* User Profile Avatar - Click to navigate to profile */}
+            <Button
+              variant="ghost"
+              onClick={() => navigate('/profile')}
+              style={{
+                cursor: 'pointer',
+                padding: '0.5rem',
+                borderRadius: '50%',
+              }}
+            >
+              <Avatar
+                src={user.profilePicture}
+                fallback={user.name?.charAt(0) || 'U'}
+                size="2"
                 style={{
-                  background: 'rgba(15, 23, 42, 0.98)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(99, 102, 241, 0.3)',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                  minWidth: '180px',
-                  marginTop: '8px',
+                  border: '2px solid rgba(99, 102, 241, 0.5)',
+                  boxShadow: '0 0 12px rgba(99, 102, 241, 0.3)',
                 }}
-              >
-                <DropdownMenu.Item
-                  onClick={() => navigate('/profile')}
-                  style={{
-                    cursor: 'pointer',
-                    color: 'rgba(226, 232, 240, 0.9)',
-                    padding: '0.75rem 1rem',
-                    fontSize: '15px',
-                  }}
-                >
-                  <PersonIcon width="16" height="16" /> My Profile
-                </DropdownMenu.Item>
-                <DropdownMenu.Separator style={{ background: 'rgba(99, 102, 241, 0.2)' }} />
-                <DropdownMenu.Item
-                  onClick={handleLogout}
-                  style={{
-                    cursor: 'pointer',
-                    color: '#f87171',
-                    padding: '0.75rem 1rem',
-                    fontSize: '15px',
-                  }}
-                >
-                  <ExitIcon width="16" height="16" /> Logout
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Root>
+              />
+            </Button>
           </Flex>
         ) : (
           <Flex align="end" gap="3">

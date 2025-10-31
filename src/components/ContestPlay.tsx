@@ -58,6 +58,14 @@ export default function ContestPlay() {
   const [contestMeta, setContestMeta] = useState<ContestMeta | null>(initialContestMeta || null);
 
   useDocumentTitle("MindMuse - Contest");
+  
+  // Add class to body for mobile styling
+  useEffect(() => {
+    document.body.classList.add('contest-play-page');
+    return () => {
+      document.body.classList.remove('contest-play-page');
+    };
+  }, []);
 
   useEffect(() => {
     if (currentAnswerResult) {
@@ -421,15 +429,18 @@ export default function ContestPlay() {
   const timePercentage = contestMeta ? (timeRemaining / (contestMeta.duration * 60 * 1000)) * 100 : 100;
 
   return (
-    <Box style={{
-      minHeight: '100vh',
-      background: 'radial-gradient(ellipse at 60% 20%, #203a55 0%, #12141c 60%, #090a10 100%)',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      overflow: 'hidden',
-      paddingTop: '70px',
-    }}>
+    <Box 
+      data-contest-play
+      style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(ellipse at 60% 20%, #203a55 0%, #12141c 60%, #090a10 100%)',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
+        paddingTop: '70px',
+        paddingBottom: '0',
+      }}>
       {/* Floating Orbs */}
       <div className="floating-orbs">
         <div className="orb orb-1"></div>

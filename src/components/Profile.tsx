@@ -11,13 +11,13 @@ import {
   CrossCircledIcon,
   BarChartIcon,
   ActivityLogIcon,
-  HomeIcon,
   BadgeIcon,
   LightningBoltIcon,
   ReaderIcon,
   GlobeIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  ExitIcon
 } from '@radix-ui/react-icons';
 import LoadingSpinner from './LoadingSpinner';
 import '../App.css';
@@ -69,6 +69,7 @@ interface ProfileData {
 export default function Profile() {
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [contestHistory, setContestHistory] = useState<ContestHistory[]>([]);
   const [insights, setInsights] = useState<Insights | null>(null);
@@ -187,27 +188,38 @@ export default function Profile() {
       paddingTop: '70px',
     }}>
       <Container size="4" px={{ initial: '4', sm: '5', md: '6' }} pt={{ initial: '4', md: '5' }} pb="6" style={{ position: 'relative', zIndex: 1 }}>
-        {/* Header with Back Button */}
+        {/* Header with Logout */}
         <Flex justify="between" align="center" mb="6">
           <Heading size="8" className="glow-text-enhanced" style={{ fontWeight: 800 }}>
             Profile
           </Heading>
           <Box
-            onClick={() => navigate('/')}
+            onClick={async () => {
+              try {
+                await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+                  method: 'POST',
+                  credentials: 'include',
+                });
+                logout();
+                navigate('/');
+              } catch (error) {
+                // Silently handle logout error
+              }
+            }}
             style={{
               cursor: 'pointer',
               padding: '0.75rem 1.5rem',
-              background: 'rgba(99, 102, 241, 0.2)',
+              background: 'rgba(239, 68, 68, 0.2)',
               borderRadius: '0.75rem',
-              border: '1px solid rgba(99, 102, 241, 0.3)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
               backdropFilter: 'blur(10px)',
               transition: 'all 0.3s ease',
             }}
           >
             <Flex align="center" gap="2">
-              <HomeIcon width={18} height={18} />
-              <Text size="3" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
-                Home
+              <ExitIcon width={18} height={18} style={{ color: '#f87171' }} />
+              <Text size="3" weight="medium" style={{ color: '#f87171' }}>
+                Logout
               </Text>
             </Flex>
           </Box>

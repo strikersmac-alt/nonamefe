@@ -17,7 +17,6 @@ import {
   RocketIcon,
   CheckCircledIcon,
   ClockIcon,
-  CopyIcon,
   Link2Icon,
   FileTextIcon,
 } from "@radix-ui/react-icons";
@@ -61,7 +60,6 @@ export default function WaitingRoom() {
   const [isAdmin, setIsAdmin] = useState(false); // TODO: Set to true if current user is contest creator
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
   const user = useAuthStore((state) => state.user);
   useDocumentTitle("MindMuse - Waiting Room");
@@ -222,33 +220,6 @@ export default function WaitingRoom() {
     }
   };
 
-  const copyContestCode = async () => {
-    if (contestMeta?.code) {
-      try {
-        await navigator.clipboard.writeText(contestMeta.code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        console.error("Failed to copy code:", err);
-        // Fallback method
-        const textArea = document.createElement("textarea");
-        textArea.value = contestMeta.code;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-          document.execCommand("copy");
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } catch (fallbackErr) {
-          console.error("Fallback copy failed:", fallbackErr);
-        }
-        document.body.removeChild(textArea);
-      }
-    }
-  };
-
   const copyContestLink = async () => {
     if (contestMeta?.code) {
       try {
@@ -337,13 +308,18 @@ export default function WaitingRoom() {
           </Badge>
 
           <Heading
-            size="6"
+            size="9"
             className="glow-text-enhanced"
             style={{
-              letterSpacing: "-0.02em",
-              fontWeight: 800,
+              letterSpacing: "0.02em",
+              fontWeight: 900,
               fontFamily: "Poppins, sans-serif",
               textAlign: "center",
+              color: "#f1f5f9",
+              fontSize: "3.5rem",
+              textShadow: "0 4px 32px rgba(96, 165, 250, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3)",
+              marginBottom: "1.5rem",
+              paddingBottom: "0.5rem",
             }}
           >
             Waiting Room
@@ -356,67 +332,60 @@ export default function WaitingRoom() {
               align="center"
               style={{ width: "100%", maxWidth: "900px" }}
             >
-              {/* Contest Code Card */}
+              {/* Contest Code Card - Compact */}
               <Card
                 style={{
-                  background: "rgba(35, 54, 85, 0.35)",
-                  backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(99, 102, 241, 0.3)",
+                  background: "rgba(35, 54, 85, 0.5)",
+                  backdropFilter: "blur(24px)",
+                  border: "1.5px solid rgba(99, 102, 241, 0.4)",
                   padding: "0.75rem 1.5rem",
                   width: "100%",
-                  maxWidth: "600px",
+                  maxWidth: "500px",
+                  boxShadow: "0 4px 24px rgba(30, 41, 59, 0.4)",
                 }}
               >
-                <Flex align="center" gap="2" wrap="wrap" justify="center">
-                  <Text
-                    size="2"
-                    style={{
-                      color: "rgba(226, 232, 240, 0.95)",
-                      fontWeight: 500,
-                    }}
-                  >
-                    Contest Code:
-                  </Text>
-                  <Text
-                    size="4"
-                    weight="bold"
-                    style={{
-                      fontFamily: "monospace",
-                      letterSpacing: "0.2em",
-                      color: "#60a5fa",
-                    }}
-                  >
-                    {contestMeta.code}
-                  </Text>
-                  <Flex gap="1">
-                    <Button
-                      size="1"
-                      variant="soft"
-                      onClick={copyContestCode}
-                      style={{ cursor: "pointer" }}
+                <Flex align="center" gap="3" wrap="wrap" justify="center">
+                  <Flex align="center" gap="2">
+                    <Text
+                      size="2"
+                      style={{
+                        color: "#94a3b8",
+                        fontWeight: 500,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        fontSize: "0.75rem",
+                      }}
                     >
-                      {copied ? (
-                        <CheckCircledIcon color="green" />
-                      ) : (
-                        <CopyIcon />
-                      )}
-                      {copied ? "Copied!" : "Code"}
-                    </Button>
-                    <Button
-                      size="1"
-                      variant="soft"
-                      color="blue"
-                      onClick={copyContestLink}
-                      style={{ cursor: "pointer" }}
+                      Code:
+                    </Text>
+                    <Text
+                      size="6"
+                      weight="bold"
+                      style={{
+                        fontFamily: "'Courier New', monospace",
+                        letterSpacing: "0.3em",
+                        color: "#60a5fa",
+                        fontSize: "1.5rem",
+                        textShadow: "0 0 20px rgba(96, 165, 250, 0.3)",
+                      }}
                     >
-                      {linkCopied ? (
-                        <CheckCircledIcon color="green" />
-                      ) : (
-                        <Link2Icon />
-                      )}
-                      {linkCopied ? "Copied!" : "Link"}
-                    </Button>
+                      {contestMeta.code}
+                    </Text>
                   </Flex>
+                  <Button
+                    size="2"
+                    variant="soft"
+                    color="blue"
+                    onClick={copyContestLink}
+                    style={{
+                      cursor: "pointer",
+                      fontWeight: 600,
+                      borderRadius: "0.5rem",
+                    }}
+                  >
+                    <Link2Icon />
+                    {linkCopied ? "Copied!" : "Link"}
+                  </Button>
                 </Flex>
               </Card>
 

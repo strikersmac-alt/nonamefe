@@ -797,7 +797,7 @@ button[variant="ghost"]:hover {
 
 @media (max-width: 767px) {
   .mobile-menu-trigger {
-    display: block;
+    display: none !important;
   }
 }
 
@@ -909,4 +909,74 @@ button[variant="ghost"]:hover {
 
 .rt-SelectItem[data-highlighted] {
   background: rgba(99, 102, 241, 0.3) !important;
+}
+
+/* ========================
+   BOTTOM NAVIGATION (MOBILE)
+   ======================== */
+
+/* Hide bottom nav by default (desktop) */
+.bottom-nav-mobile {
+  display: none !important;
+}
+
+/* Show bottom nav on mobile */
+@media (max-width: 767px) {
+  .bottom-nav-mobile {
+    display: block !important;
+  }
+  
+  /* Add bottom padding to pages to prevent content from being hidden behind bottom nav */
+  body {
+    padding-bottom: 60px;
+  }
+  
+  /* Bottom nav item hover effect */
+  .bottom-nav-item:active {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  
+  /* Blend top navbar into page on mobile - remove border and make more transparent */
+  .navbar-container {
+    background: rgba(15, 23, 42, 0.3) !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Keep scrolled state subtle on mobile */
+  .navbar-scrolled {
+    background: rgba(15, 23, 42, 0.5) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2) !important;
+    border-bottom: none !important;
+  }
+}
+
+/* ========================
+   CONTEST PLAY PAGE STYLES (MOBILE)
+   ======================== */
+
+/* Remove bottom padding and make navbar minimal during contest play */
+@media (max-width: 767px) {
+  /* Remove bottom padding on contest play page */
+  body.contest-play-page {
+    padding-bottom: 0 !important;
+  }
+  
+  /* Hide desktop nav items during contest */
+  body.contest-play-page .navbar-container .desktop-nav {
+    display: none !important;
+  }
+  
+  /* Make navbar even more transparent during contest */
+  body.contest-play-page .navbar-container {
+    background: rgba(15, 23, 42, 0.15) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  /* Keep navbar minimal even when scrolled */
+  body.contest-play-page .navbar-scrolled {
+    background: rgba(15, 23, 42, 0.25) !important;
+    box-shadow: none !important;
+  }
 }

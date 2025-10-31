@@ -8,12 +8,16 @@ import Standings from './components/Standings';
 import ContestSummary from './components/ContestSummary';
 import Profile from './components/Profile';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import Practice from './components/Practice';
 import PrivateRoute from './components/PrivateRoute';
 import NotFound from './components/NotFound';
 import { ToastContainer } from 'react-toastify';
+import { useAuthStore } from './store/authStore';
 
 export default function App() {
+	const { user } = useAuthStore();
+
 	return (
 		<Router>
 			<Navbar />
@@ -52,6 +56,7 @@ export default function App() {
 				<Route path="/contest/:contestId/summary" element={<ContestSummary />} />
 				<Route path="*" element={<NotFound />} />
 			</Routes>
+			{user && <BottomNav />}
 		</Router>
 	);
 }

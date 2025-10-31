@@ -323,8 +323,8 @@ export default function CreateContest() {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(9, 10, 16, 0.95)',
-            backdropFilter: 'blur(10px)',
+            background: 'radial-gradient(ellipse at 50% 50%, rgba(99, 102, 241, 0.15) 0%, rgba(18, 20, 28, 0.95) 50%, rgba(9, 10, 16, 0.98) 100%)',
+            backdropFilter: 'blur(20px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -332,75 +332,108 @@ export default function CreateContest() {
             zIndex: 9999,
           }}
         >
-          <Flex direction="column" align="center" gap="5" style={{ maxWidth: '500px', width: '90%' }}>
-            {/* Animated Spinner */}
-            <Box
-              style={{
-                width: '80px',
-                height: '80px',
-                border: '4px solid rgba(99, 102, 241, 0.2)',
-                borderTop: '4px solid #667eea',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }}
-            />
-            
-            {/* Loading Text */}
-            <Flex direction="column" align="center" gap="2">
-              <Heading
-                size="6"
-                style={{
-                  color: '#e2e8f0',
-                  fontWeight: 700,
-                  textAlign: 'center',
-                }}
-              >
-                Creating Your Contest
-              </Heading>
-              <Text
-                size="3"
-                style={{
-                  color: 'rgba(148, 163, 184, 0.9)',
-                  textAlign: 'center',
-                }}
-              >
-                Please wait while we generate your questions...
-              </Text>
-            </Flex>
-            
-            {/* Progress Bar */}
-            <Box style={{ width: '100%' }}>
-              <Flex justify="between" align="center" mb="2">
-                <Text size="2" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>
-                  Progress
-                </Text>
-                <Text size="3" weight="bold" style={{ color: '#667eea' }}>
-                  {Math.round(loadingProgress)}%
-                </Text>
-              </Flex>
+          <Box
+            style={{
+              maxWidth: '500px',
+              width: '90%',
+              background: 'rgba(35, 54, 85, 0.4)',
+              borderRadius: '2rem',
+              boxShadow: '0 8px 64px 0 rgba(99, 102, 241, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(24px)',
+              border: '1.5px solid rgba(99, 102, 241, 0.3)',
+              padding: '3rem 2rem',
+              position: 'relative',
+            }}
+          >
+            <Flex direction="column" align="center" gap="5">
+              {/* Animated Spinner */}
               <Box
                 style={{
-                  width: '100%',
-                  height: '8px',
-                  background: 'rgba(99, 102, 241, 0.2)',
-                  borderRadius: '999px',
-                  overflow: 'hidden',
-                  position: 'relative',
+                  width: '80px',
+                  height: '80px',
+                  border: '4px solid rgba(99, 102, 241, 0.2)',
+                  borderTop: '4px solid #667eea',
+                  borderRight: '4px solid #764ba2',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)',
                 }}
-              >
+              />
+              
+              {/* Loading Text */}
+              <Flex direction="column" align="center" gap="2">
+                <Heading
+                  size="6"
+                  className="glow-text-enhanced"
+                  style={{
+                    fontWeight: 700,
+                    textAlign: 'center',
+                  }}
+                >
+                  Creating Your Contest
+                </Heading>
+                <Text
+                  size="3"
+                  style={{
+                    color: 'rgba(226, 232, 240, 0.8)',
+                    textAlign: 'center',
+                  }}
+                >
+                  Please wait while we generate your questions...
+                </Text>
+              </Flex>
+              
+              {/* Progress Bar */}
+              <Box style={{ width: '100%' }}>
+                <Flex justify="between" align="center" mb="2">
+                  <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>
+                    Progress
+                  </Text>
+                  <Text size="3" weight="bold" style={{ 
+                    color: '#a78bfa',
+                    textShadow: '0 0 10px rgba(167, 139, 250, 0.5)',
+                  }}>
+                    {Math.round(loadingProgress)}%
+                  </Text>
+                </Flex>
                 <Box
                   style={{
-                    width: `${loadingProgress}%`,
-                    height: '100%',
-                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                    width: '100%',
+                    height: '10px',
+                    background: 'rgba(99, 102, 241, 0.15)',
                     borderRadius: '999px',
-                    transition: 'width 0.3s ease-out',
-                    boxShadow: '0 0 10px rgba(102, 126, 234, 0.5)',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    border: '1px solid rgba(99, 102, 241, 0.2)',
                   }}
-                />
+                >
+                  <Box
+                    style={{
+                      width: `${loadingProgress}%`,
+                      height: '100%',
+                      background: 'linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f472b6 100%)',
+                      borderRadius: '999px',
+                      transition: 'width 0.3s ease-out',
+                      boxShadow: '0 0 15px rgba(102, 126, 234, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                      position: 'relative',
+                    }}
+                  >
+                    <Box
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%)',
+                        animation: 'shimmer 2s infinite',
+                      }}
+                    />
+                  </Box>
+                </Box>
               </Box>
-            </Box>
-          </Flex>
+            </Flex>
+          </Box>
         </Box>
       )}
       {/* Floating Orbs */}
@@ -827,7 +860,11 @@ export default function CreateContest() {
                             variant="soft"
                             onClick={() => {
                               const joinLink = `${window.location.origin}/join-contest?code=${response.code}`;
-                              navigator.clipboard.writeText(joinLink);
+                              const topicText = formData.contestType === 'nptel' 
+                                ? selectedCourse?.name || 'NPTEL Course'
+                                : formData.topic || 'Quiz';
+                              const customMessage = `Hey! Join me in a contest on "${topicText}"!\n\n${joinLink}`;
+                              navigator.clipboard.writeText(customMessage);
                               setLinkCopied(true);
                               setTimeout(() => setLinkCopied(false), 2000);
                             }}

@@ -81,6 +81,7 @@ export default function Standings() {
     totalParticipants: number;
     capacity: number;
   } | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const user = useAuthStore((state) => state.user);
   const currentUserId = user?._id || "";
   useDocumentTitle("MindMuse - Standings");
@@ -240,6 +241,16 @@ export default function Standings() {
   const yourScore = userStanding?.score ?? finalScore ?? 0;
   const yourAttempted = userStanding?.attempted ?? 0;
 
+  // Check if user won 1st place and trigger confetti
+  useEffect(() => {
+    if (standings.length > 0 && standings[0]?.userId === currentUserId) {
+      setShowConfetti(true);
+      // Stop confetti after 5 seconds
+      const timer = setTimeout(() => setShowConfetti(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [standings, currentUserId]);
+
   if (loading) {
     return <LoadingSpinner message="Loading standings..." />;
   }
@@ -257,6 +268,67 @@ export default function Standings() {
         paddingTop: "70px",
       }}
     >
+      {/* Confetti Animation for 1st Place Winner */}
+      {showConfetti && (
+        <>
+          {/* Left Side Confetti */}
+          {Array.from({ length: 50 }).map((_, i) => (
+            <Box
+              key={`left-${i}`}
+              className="confetti"
+              style={{
+                position: "fixed",
+                left: `${Math.random() * 40 + 5}%`,
+                top: "-10px",
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                background: [
+                  "#667eea",
+                  "#764ba2",
+                  "#f472b6",
+                  "#fbbf24",
+                  "#10b981",
+                  "#3b82f6",
+                ][Math.floor(Math.random() * 6)],
+                opacity: 0.8,
+                borderRadius: Math.random() > 0.5 ? "50%" : "0",
+                animation: `confettiFall ${Math.random() * 3 + 2}s linear forwards`,
+                animationDelay: `${Math.random() * 0.5}s`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+                zIndex: 10000,
+              }}
+            />
+          ))}
+          {/* Right Side Confetti */}
+          {Array.from({ length: 50 }).map((_, i) => (
+            <Box
+              key={`right-${i}`}
+              className="confetti"
+              style={{
+                position: "fixed",
+                right: `${Math.random() * 40 + 5}%`,
+                top: "-10px",
+                width: `${Math.random() * 10 + 5}px`,
+                height: `${Math.random() * 10 + 5}px`,
+                background: [
+                  "#667eea",
+                  "#764ba2",
+                  "#f472b6",
+                  "#fbbf24",
+                  "#10b981",
+                  "#3b82f6",
+                ][Math.floor(Math.random() * 6)],
+                opacity: 0.8,
+                borderRadius: Math.random() > 0.5 ? "50%" : "0",
+                animation: `confettiFall ${Math.random() * 3 + 2}s linear forwards`,
+                animationDelay: `${Math.random() * 0.5}s`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+                zIndex: 10000,
+              }}
+            />
+          ))}
+        </>
+      )}
       <div className="floating-orbs">
         <div className="orb orb-1"></div>
         <div className="orb orb-2"></div>

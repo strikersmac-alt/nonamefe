@@ -98,6 +98,26 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-10px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
 /* ========================
    QUIZ ILLUSTRATION STYLES
    ======================== */
@@ -563,10 +583,20 @@ button[variant="ghost"]:hover {
     padding-bottom: 60px;
   }
   
-  /* Bottom nav item hover effect */
+  /* Bottom nav item active effect - subtle custom feedback */
+  .bottom-nav-item {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
   .bottom-nav-item:active {
-    transform: scale(0.95);
-    opacity: 0.7;
+    background: rgba(99, 102, 241, 0.1);
+    transform: scale(0.96);
   }
   
   /* Blend top navbar into page on mobile - remove border and make more transparent */

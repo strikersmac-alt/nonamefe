@@ -57,11 +57,15 @@ export default function BottomNav() {
           align="center"
           gap="1"
           onClick={() => handleNav('/')}
+          className="bottom-nav-item"
           style={{
             cursor: 'pointer',
             padding: '0.3rem 0.75rem',
             flex: 1,
             transition: 'all 0.2s ease',
+            userSelect: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            borderRadius: '0.5rem',
           }}
         >
           <HomeIcon 
@@ -87,11 +91,15 @@ export default function BottomNav() {
           align="center"
           gap="1"
           onClick={() => handleNav('/create-contest')}
+          className="bottom-nav-item"
           style={{
             cursor: 'pointer',
             padding: '0.3rem 0.75rem',
             flex: 1,
             transition: 'all 0.2s ease',
+            userSelect: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            borderRadius: '0.5rem',
           }}
         >
           <PlusIcon 
@@ -117,11 +125,15 @@ export default function BottomNav() {
           align="center"
           gap="1"
           onClick={() => handleNav('/join-contest')}
+          className="bottom-nav-item"
           style={{
             cursor: 'pointer',
             padding: '0.3rem 0.75rem',
             flex: 1,
             transition: 'all 0.2s ease',
+            userSelect: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            borderRadius: '0.5rem',
           }}
         >
           <RocketIcon 
@@ -147,11 +159,15 @@ export default function BottomNav() {
           align="center"
           gap="1"
           onClick={() => handleNav('/practice')}
+          className="bottom-nav-item"
           style={{
             cursor: 'pointer',
             padding: '0.3rem 0.75rem',
             flex: 1,
             transition: 'all 0.2s ease',
+            userSelect: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            borderRadius: '0.5rem',
           }}
         >
           <DashboardIcon 

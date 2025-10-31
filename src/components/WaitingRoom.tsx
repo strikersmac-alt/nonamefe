@@ -233,14 +233,19 @@ export default function WaitingRoom() {
     if (contestMeta?.code) {
       try {
         const joinLink = `${window.location.origin}/join-contest?code=${contestMeta.code}`;
-        await navigator.clipboard.writeText(joinLink);
+        const topicText = contestMeta.topic || 'Quiz Contest';
+        const customMessage = `Hey! Join me in a contest on "${topicText}"!\n\n${joinLink}`;
+        await navigator.clipboard.writeText(customMessage);
         setLinkCopied(true);
         setTimeout(() => setLinkCopied(false), 2000);
       } catch (err) {
         console.error("Failed to copy link:", err);
         // Fallback method
         const textArea = document.createElement("textarea");
-        textArea.value = `${window.location.origin}/join-contest?code=${contestMeta.code}`;
+        const joinLink = `${window.location.origin}/join-contest?code=${contestMeta.code}`;
+        const topicText = contestMeta.topic || 'Quiz Contest';
+        const customMessage = `Hey! Join me in a contest on "${topicText}"!\n\n${joinLink}`;
+        textArea.value = customMessage;
         textArea.style.position = "fixed";
         textArea.style.left = "-999999px";
         document.body.appendChild(textArea);
@@ -320,15 +325,13 @@ export default function WaitingRoom() {
             size="9"
             className="glow-text-enhanced"
             style={{
-              letterSpacing: "0.02em",
-              fontWeight: 900,
+              letterSpacing: "-0.02em",
+              fontWeight: 800,
               fontFamily: "Poppins, sans-serif",
               textAlign: "center",
-              color: "#f1f5f9",
-              fontSize: "3.5rem",
-              textShadow: "0 4px 32px rgba(96, 165, 250, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3)",
-              marginBottom: "1.5rem",
-              paddingBottom: "0.5rem",
+              marginBottom: "0.5rem",
+              padding: "0.5rem 0",
+              lineHeight: "1.2",
             }}
           >
             Waiting Room

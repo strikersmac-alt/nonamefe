@@ -60,6 +60,7 @@ export default function CreateContest() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [response, setResponse] = useState<ApiResponse | null>(null);
   const [copied, setCopied] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -142,7 +143,24 @@ export default function CreateContest() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setLoadingProgress(0);
     setResponse(null);
+
+    // Progress animation - complete in 13 seconds
+    const totalDuration = 13000; // 13 seconds
+    const intervalTime = 100; // Update every 100ms
+    const incrementPerInterval = (100 / totalDuration) * intervalTime;
+    
+    const progressInterval = setInterval(() => {
+      setLoadingProgress(prev => {
+        const next = prev + incrementPerInterval;
+        if (next >= 95) {
+          clearInterval(progressInterval);
+          return 95; // Stop at 95% until data arrives
+        }
+        return next;
+      });
+    }, intervalTime);
 
     try {
       // Get auth token from cookies
@@ -161,11 +179,13 @@ export default function CreateContest() {
       if (formData.contestType === 'nptel') {
         // NPTEL contest creation
         if (!formData.courseCode || formData.weeks.length === 0) {
+          clearInterval(progressInterval);
           setResponse({
             success: false,
             message: 'Please select a course and at least one week',
           });
           setLoading(false);
+          setLoadingProgress(0);
           return;
         }
 
@@ -274,7 +294,13 @@ export default function CreateContest() {
         message: error.response?.data?.message || 'Unable to create contest. Please try again.',
       });
     } finally {
-      setLoading(false);
+      // Clear interval and rush to 100% when done
+      clearInterval(progressInterval);
+      setLoadingProgress(100);
+      setTimeout(() => {
+        setLoading(false);
+        setLoadingProgress(0);
+      }, 500); // Small delay to show 100%
     }
   };
 
@@ -288,6 +314,95 @@ export default function CreateContest() {
       overflow: 'hidden',
       paddingTop: '70px',
     }}>
+      {/* Loading Overlay */}
+      {loading && (
+        <Box
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(9, 10, 16, 0.95)',
+            backdropFilter: 'blur(10px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <Flex direction="column" align="center" gap="5" style={{ maxWidth: '500px', width: '90%' }}>
+            {/* Animated Spinner */}
+            <Box
+              style={{
+                width: '80px',
+                height: '80px',
+                border: '4px solid rgba(99, 102, 241, 0.2)',
+                borderTop: '4px solid #667eea',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            
+            {/* Loading Text */}
+            <Flex direction="column" align="center" gap="2">
+              <Heading
+                size="6"
+                style={{
+                  color: '#e2e8f0',
+                  fontWeight: 700,
+                  textAlign: 'center',
+                }}
+              >
+                Creating Your Contest
+              </Heading>
+              <Text
+                size="3"
+                style={{
+                  color: 'rgba(148, 163, 184, 0.9)',
+                  textAlign: 'center',
+                }}
+              >
+                Please wait while we generate your questions...
+              </Text>
+            </Flex>
+            
+            {/* Progress Bar */}
+            <Box style={{ width: '100%' }}>
+              <Flex justify="between" align="center" mb="2">
+                <Text size="2" style={{ color: 'rgba(148, 163, 184, 0.9)' }}>
+                  Progress
+                </Text>
+                <Text size="3" weight="bold" style={{ color: '#667eea' }}>
+                  {Math.round(loadingProgress)}%
+                </Text>
+              </Flex>
+              <Box
+                style={{
+                  width: '100%',
+                  height: '8px',
+                  background: 'rgba(99, 102, 241, 0.2)',
+                  borderRadius: '999px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}
+              >
+                <Box
+                  style={{
+                    width: `${loadingProgress}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+                    borderRadius: '999px',
+                    transition: 'width 0.3s ease-out',
+                    boxShadow: '0 0 10px rgba(102, 126, 234, 0.5)',
+                  }}
+                />
+              </Box>
+            </Box>
+          </Flex>
+        </Box>
+      )}
       {/* Floating Orbs */}
       <div className="floating-orbs">
         <div className="orb orb-1"></div>

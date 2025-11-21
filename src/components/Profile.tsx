@@ -2,11 +2,11 @@ import { Box, Flex, Heading, Text, Card, Grid, Container, Badge, Avatar, Button 
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { 
-  PersonIcon, 
-  CalendarIcon, 
-  RocketIcon, 
-  StarFilledIcon, 
+import {
+  PersonIcon,
+  CalendarIcon,
+  RocketIcon,
+  StarFilledIcon,
   CheckCircledIcon,
   CrossCircledIcon,
   BarChartIcon,
@@ -26,6 +26,7 @@ import useDocumentTitle from '../hooks/useDocumentTitle';
 interface ContestHistory {
   contestId: string;
   code: string;
+  topic?: string;
   mode: string;
   isLive: boolean;
   duration: number;
@@ -166,8 +167,8 @@ export default function Profile() {
         gap: '1rem',
       }}>
         <Text size="5" style={{ color: '#f87171' }}>{error}</Text>
-        <Text 
-          size="3" 
+        <Text
+          size="3"
           style={{ color: '#60a5fa', cursor: 'pointer' }}
           onClick={() => navigate('/')}
         >
@@ -260,9 +261,9 @@ export default function Profile() {
               <Flex align="center" gap="2" mt="1">
                 <CalendarIcon width={16} height={16} style={{ color: 'rgba(226, 232, 240, 0.85)' }} />
                 <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.85)' }}>
-                  Member since {new Date(profile?.memberSince || '').toLocaleDateString('en-US', { 
-                    month: 'long', 
-                    year: 'numeric' 
+                  Member since {new Date(profile?.memberSince || '').toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
                   })}
                 </Text>
               </Flex>
@@ -465,14 +466,14 @@ export default function Profile() {
                 transition: 'all 0.3s ease',
                 cursor: 'pointer',
               }}
-              onClick={() => navigate(`/contest/${contest.contestId}/standings`, { 
-                state: { fromProfile: true } 
-              })}
+                onClick={() => navigate(`/contest/${contest.contestId}/standings`, {
+                  state: { fromProfile: true }
+                })}
               >
                 <Flex justify="between" align="start" gap="4" direction={{ initial: 'column', sm: 'row' }}>
                   <Flex direction="column" gap="2" style={{ flex: 1 }}>
                     <Flex align="center" gap="2">
-                      <Badge size="2" color="gray" style={{ background: getModeColor(contest.mode), display: 'flex', alignItems: 'center', gap: '0.25rem'  }}>
+                      <Badge size="2" color="gray" style={{ background: getModeColor(contest.mode), display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                         {getModeIcon(contest.mode)} {contest.mode.toUpperCase()}
                       </Badge>
                       {contest.isLive && (
@@ -481,12 +482,24 @@ export default function Profile() {
                         </Badge>
                       )}
                     </Flex>
-                    <Heading size="5" style={{
-                      color: '#60a5fa',
-                      fontWeight: 700,
-                    }}>
-                      Contest #{contest.code}
-                    </Heading>
+
+                    <Flex align="center" gap="3" wrap="wrap">
+                      <Heading
+                        size="6"
+                        style={{
+                          background: 'linear-gradient(135deg, #60a5fa, #a78bfa)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {contest.topic}
+                      </Heading>
+                      {/* <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.75)', fontWeight: 500 }}>
+                          Contest #{contest.code}
+                        </Text> */}
+                    </Flex>
+
                     <Text size="2" style={{ color: '#e2e8f0', fontWeight: 500 }}>
                       {new Date(contest.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
@@ -609,30 +622,30 @@ export default function Profile() {
         )}
       </Container>
       <Box className="footer" style={{
-              width: '100%',
-              marginTop: 'auto',
-              padding: '1rem',
-              textAlign: 'center',
-              backdropFilter: 'blur(16px)',
-              background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.6))',
-              borderTop: '1px solid rgba(99, 102, 241, 0.15)',
-              position: 'relative',
-            }}>
-              <Flex direction="column" align="center" gap="1">
-                <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
-                  MindMuse
-                </Text>
-                <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)', fontSize: '0.75rem' }}>
-                  Unlock Your Curiosity
-                </Text>
-                <Text size="1" style={{
-                  color: 'rgba(148, 163, 184, 0.5)',
-                  fontSize: '0.7rem',
-                }}>
-                  &copy; {new Date().getFullYear()} MindMuse. All rights reserved.
-                </Text>
-              </Flex>
-            </Box>
+        width: '100%',
+        marginTop: 'auto',
+        padding: '1rem',
+        textAlign: 'center',
+        backdropFilter: 'blur(16px)',
+        background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.3), rgba(15, 23, 42, 0.6))',
+        borderTop: '1px solid rgba(99, 102, 241, 0.15)',
+        position: 'relative',
+      }}>
+        <Flex direction="column" align="center" gap="1">
+          <Text size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.9)' }}>
+            MindMuse
+          </Text>
+          <Text size="1" style={{ color: 'rgba(148, 163, 184, 0.7)', fontSize: '0.75rem' }}>
+            Unlock Your Curiosity
+          </Text>
+          <Text size="1" style={{
+            color: 'rgba(148, 163, 184, 0.5)',
+            fontSize: '0.7rem',
+          }}>
+            &copy; {new Date().getFullYear()} MindMuse. All rights reserved.
+          </Text>
+        </Flex>
+      </Box>
     </Box>
   );
 }

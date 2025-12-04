@@ -25,6 +25,12 @@ import axios from "axios";
 import "../App.css";
 import { useAuthStore } from "../store/authStore";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import start_sound from '../../audios/game-start-317318.mp3';
+
+const playStartSound = () => {
+  const audio = new Audio(start_sound);
+  audio.play();
+}  
 interface Participant {
   userId: string;
   name: string;
@@ -203,6 +209,9 @@ export default function WaitingRoom() {
     socketInstance.on("contestStarted", (data) => {
       // Clear any errors and navigate to contest play page when admin starts the contest
       setError(null);
+      // play audio 
+      playStartSound();
+
       navigate(`/contest/${contestId}/play`, {
         state: {
           contestMeta: {

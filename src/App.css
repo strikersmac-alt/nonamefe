@@ -642,3 +642,19 @@ button[variant="ghost"]:hover {
     box-shadow: none !important;
   }
 }
+
+/* ========================
+   INFO ICON HOVER
+   ======================== */
+
+.info-icon-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(148, 163, 184, 0.7);
+  cursor: help;
+}
+
+.info-icon-hover:hover {
+  color: #a78bfa !important;
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.6));
+}

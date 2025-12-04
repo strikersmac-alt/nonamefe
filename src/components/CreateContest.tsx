@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog } from '@radix-ui/themes';
-import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon, CopyIcon, Link2Icon } from '@radix-ui/react-icons';
+import { Box, Flex, Heading, Text, Card, Container, Button, TextField, Select, Badge, Grid, Dialog, Tooltip } from '@radix-ui/themes';
+import { RocketIcon, CheckCircledIcon, CrossCircledIcon, BookmarkIcon, CopyIcon, Link2Icon, FileTextIcon, UploadIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { createUserContestAnalytics, createDailyUserAnalytics, createContestAnalytics } from '../services/analyticsService';
@@ -17,6 +17,7 @@ interface FormData {
   contestType: 'normal' | 'nptel';
   courseCode: string;
   weeks: number[];
+  pdf: File | null;
 }
 
 interface Course {
@@ -57,6 +58,7 @@ export default function CreateContest() {
     contestType: 'normal',
     courseCode: '',
     weeks: [],
+    pdf: null
   });
 
   const [loading, setLoading] = useState(false);
@@ -107,7 +109,7 @@ export default function CreateContest() {
     }
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -150,7 +152,7 @@ export default function CreateContest() {
     const totalDuration = 15000; // 13 seconds
     const intervalTime = 100; // Update every 100ms
     const incrementPerInterval = (100 / totalDuration) * intervalTime;
-    
+
     const progressInterval = setInterval(() => {
       setLoadingProgress(prev => {
         const next = prev + incrementPerInterval;
@@ -211,6 +213,7 @@ export default function CreateContest() {
         );
       } else {
         // Normal AI-generated contest creation
+        console.log("paylaod", formData.pdf);
         const payload = {
           topic: formData.topic,
           difficulty: formData.difficulty,
@@ -219,6 +222,8 @@ export default function CreateContest() {
           duration: parseInt(formData.duration, 10),
           startTime: formData.startTime || Math.floor(Date.now() / 1000).toString(),
           timeZone: 'UTC',
+          pdf: formData.pdf
+
         };
 
         result = await axios.post<ApiResponse>(
@@ -226,7 +231,7 @@ export default function CreateContest() {
           payload,
           {
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'multipart/form-data'
             },
             withCredentials: true,
           }
@@ -237,7 +242,7 @@ export default function CreateContest() {
         if (user?._id) {
           const timestamp = Date.now();
           try {
-            
+
             await createUserContestAnalytics(
               user._id,
               formData.contestType,
@@ -359,7 +364,7 @@ export default function CreateContest() {
                   boxShadow: '0 0 20px rgba(102, 126, 234, 0.3)',
                 }}
               />
-              
+
               {/* Loading Text */}
               <Flex direction="column" align="center" gap="2">
                 <Heading
@@ -382,14 +387,14 @@ export default function CreateContest() {
                   Please wait while we generate your questions...
                 </Text>
               </Flex>
-              
+
               {/* Progress Bar */}
               <Box style={{ width: '100%' }}>
                 <Flex justify="between" align="center" mb="2">
                   <Text size="2" style={{ color: 'rgba(226, 232, 240, 0.7)' }}>
                     Progress
                   </Text>
-                  <Text size="3" weight="bold" style={{ 
+                  <Text size="3" weight="bold" style={{
                     color: '#a78bfa',
                     textShadow: '0 0 10px rgba(167, 139, 250, 0.5)',
                   }}>
@@ -495,7 +500,7 @@ export default function CreateContest() {
               </Text>
 
               {/* Form */}
-              <form onSubmit={handleSubmit}>
+              <form encType="multipart/form-data" onSubmit={handleSubmit}>
                 <Flex direction="column" gap="3">
                   {/* Contest Type */}
                   <Box>
@@ -669,7 +674,9 @@ export default function CreateContest() {
                         }}
                       />
                     </Box>
+
                   )}
+
 
                   {/* Difficulty - Only for Normal contests */}
                   {formData.contestType === 'normal' && (
@@ -698,7 +705,85 @@ export default function CreateContest() {
                       </Select.Root>
                     </Box>
                   )}
-
+                  {/* PDF Upload */}
+                  <Box>
+                    <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
+                      Upload PDF Context
+                    </Text>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      id="pdf-upload"
+                      name="pdf"
+                      onChange={(e) => handleInputChange('pdf', e.target.files ? e.target.files[0] : null)}
+                      style={{ display: 'none' }}
+                    />
+                    <label htmlFor="pdf-upload">
+                      <Flex
+                        align="center"
+                        justify="between"
+                        style={{
+                          background: 'rgba(15, 23, 42, 0.5)',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          borderRadius: '4px', // Standard Radix radius usually, or matching inputs
+                          padding: '0 12px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          height: '40px', // Match TextField height
+                          width: '100%'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.6)';
+                          e.currentTarget.style.background = 'rgba(15, 23, 42, 0.7)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+                          e.currentTarget.style.background = 'rgba(15, 23, 42, 0.5)';
+                        }}
+                      >
+                        <Flex align="center" gap="2" style={{ overflow: 'hidden' }}>
+                          {formData.pdf ? (
+                            <FileTextIcon color="#a78bfa" width={18} height={18} />
+                          ) : (
+                            <UploadIcon color="rgba(148, 163, 184, 0.7)" width={18} height={18} />
+                          )}
+                          <Text
+                            size="2"
+                            style={{
+                              color: formData.pdf ? 'white' : 'rgba(148, 163, 184, 0.7)',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}
+                          >
+                            {formData.pdf ? formData.pdf.name : 'Click to upload PDF...'}
+                          </Text>
+                        </Flex>
+                        <Flex align="center" gap="3">
+                          {formData.pdf && (
+                            <Badge color="green" variant="soft" radius="full">
+                              Selected
+                            </Badge>
+                          )}
+                          <Tooltip content="Upload a PDF to generate questions from its content">
+                            <Box
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                              }}
+                              style={{ display: 'flex', alignItems: 'center' }}
+                            >
+                              <InfoCircledIcon
+                                width={18}
+                                height={18}
+                                className="info-icon-hover"
+                              />
+                            </Box>
+                          </Tooltip>
+                        </Flex>
+                      </Flex>
+                    </label>
+                  </Box>
                   {/* Number of Questions */}
                   <Box>
                     <Text as="label" size="2" weight="medium" style={{ color: 'rgba(226, 232, 240, 0.95)', marginBottom: '0.5rem', display: 'block' }}>
@@ -835,7 +920,7 @@ export default function CreateContest() {
                             {response.code}
                           </Text>
                         </Box>
-                        
+
                         <Flex gap="2" wrap="wrap" justify="center">
                           <Button
                             size="3"
@@ -854,13 +939,13 @@ export default function CreateContest() {
                             <CopyIcon />
                             {copied ? 'Copied!' : 'Copy Code'}
                           </Button>
-                          
+
                           <Button
                             size="3"
                             variant="soft"
                             onClick={() => {
                               const joinLink = `${window.location.origin}/join-contest?code=${response.code}`;
-                              const topicText = formData.contestType === 'nptel' 
+                              const topicText = formData.contestType === 'nptel'
                                 ? selectedCourse?.name || 'NPTEL Course'
                                 : formData.topic || 'Quiz';
                               const customMessage = `Hey! Join me in a contest on "${topicText}"!\n\n${joinLink}`;
@@ -949,7 +1034,7 @@ export default function CreateContest() {
                 >
                   <Flex align="center" justify="center" gap="1" style={{ minWidth: 0 }}>
                     {/* <Checkbox checked={formData.weeks.includes(week)} style={{ flexShrink: 0 }} /> */}
-                    <Text size="1" weight="medium" style={{ 
+                    <Text size="1" weight="medium" style={{
                       color: 'rgba(226, 232, 240, 0.95)',
                       // whiteSpace: 'nowrap',
                       fontSize: 'clamp(0.7rem, 1.5vw, 0.875rem)',
